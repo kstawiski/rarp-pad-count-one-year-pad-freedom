@@ -1,0 +1,2179 @@
+{
+  "additional_test_sha256": {
+    "test_06_derivation_edge_regression.py": "f9d6e7d38642632b285a18d6bc459920be991dbfe0f7dfb0b463f7fa3363011f"
+  },
+  "allowlist": {
+    "columns": {
+      "continence_events_long": [
+        "master_patient_id",
+        "event_index",
+        "country",
+        "surgery_date",
+        "event_date",
+        "days_from_surgery",
+        "event_phase",
+        "pad_free",
+        "pads_per_day",
+        "pads_per_day_min",
+        "pads_per_day_max",
+        "diaper_count_min",
+        "diaper_count_max",
+        "safety_pad_documented",
+        "usable_continence_observation",
+        "event_date_ambiguous",
+        "event_date_precision_source_derived"
+      ],
+      "continence_milestones_long": [
+        "master_patient_id",
+        "milestone_month",
+        "pad_free",
+        "observed"
+      ],
+      "patient_wide": [
+        "master_patient_id",
+        "age",
+        "country",
+        "robotic_platform_used",
+        "surgery_date"
+      ]
+    },
+    "release_tables": [
+      "baseline_pet_nodal_status",
+      "clinical_domains_safe",
+      "complications_long",
+      "complications_structured_safe",
+      "continence_events_long",
+      "continence_milestones_long",
+      "erectile_function_structured_safe",
+      "erectile_long",
+      "governed_psa_endpoint_input",
+      "imaging_observation",
+      "patient_wide",
+      "postoperative_treatment_long",
+      "prom_instruments_safe",
+      "proms_long",
+      "psa_long",
+      "psa_timepoint_labels_safe",
+      "recurrence_endpoints_long"
+    ],
+    "tables": [
+      "patient_wide",
+      "continence_events_long",
+      "continence_milestones_long"
+    ]
+  },
+  "authority": "The user-designated release is authoritative and read only. Validity, D1 status masking, window grouping and tie order are imported unchanged from the accepted 02 and 03 scripts. The governing design is the observed-assessment amendment, which authorises no clinical fact.",
+  "baseline_reconciliation": {
+    "canonical_ladder": {
+      "all_released": 1497,
+      "early_status_known": 644,
+      "early_users": 460,
+      "early_users_with_year": 226,
+      "paired_early_year": 309,
+      "robotic": 1397,
+      "valid_dated_postoperative_continence": 5376,
+      "year_padfree_observed_pairs": 86
+    },
+    "cohort_ladder": {
+      "all_released": 1497,
+      "early_status_known": 644,
+      "early_users": 460,
+      "early_users_with_year": 226,
+      "paired_early_year": 309,
+      "robotic": 1397,
+      "valid_dated_postoperative_continence": 5376,
+      "year_padfree_observed_pairs": 86
+    },
+    "early_users_without_year_status": {
+      "conflicting_year_window_evidence_only": 1,
+      "no_valid_year_window_observation": 233,
+      "reconciles": true,
+      "total": 234
+    },
+    "generalised_selector_reproduces_accepted_selection": true,
+    "historical_inventory_status": "Superseded row-based inventory retained as historical accounting only. It is not an adjudicated exposure and is not used for any grouping here.",
+    "historical_selected_row_burden_in_observed_pairs": {
+      "one": 102,
+      "quantity_uncertain": 36,
+      "two_or_more": 88
+    },
+    "ladder_matches_accepted_counts": true
+  },
+  "candidate_membership_changed": false,
+  "clinical_estimates_computed": false,
+  "code_sha256": {
+    "00_preflight.py": "96617913eec5b4def655931db08ebbc1171a1e32e982e13183e59601ddb9f95a",
+    "02_eda_authoritative.py": "8f601421755dd3f6da5c7570b7ba88039f4d0c410fff3071115fdf23dfb30e6f",
+    "03_conflict_impact.py": "709b3f95f4050e9c5100fe7db3789424dbff66a16701176f1c5f22c352d537f2",
+    "06_derive_observed_assessments.py": "d10061ee61e303b3104c53bb8b0d25809a5b34f3789250590b3ecb2d86267695"
+  },
+  "context_provenance_note": "Only accepted, settled context is bound by hash. The concurrently owned covariate EDA record is not bound, so its expected rebuilds cannot fail this verification for reasons unrelated to this derivation.",
+  "context_sha256": {
+    "ANALYSIS_AMENDMENT_OBSERVED_ASSESSMENTS.md": "f4c0bb7e76f8490e035da94a722464890f43b342f1eb8daf06a0fbd06121e758",
+    "ANALYSIS_PLAN.md": "9e12c4f486cf7ca649d6ecadc7d8aa85cf460b3ed222dcfcb5cf6387487fd14c",
+    "evidence/CONFLICT_IMPACT.json": "c858b39994b369a05c60e69e871c5f1121778dd67bd9ca21e2d57d211683556d",
+    "evidence/EDA_AUTHORITATIVE_RELEASE.json": "915720c43f1dcc61ed78e16f71ba0203887a35bb2e62f1f34e26a6c53342a45e"
+  },
+  "definitions": {
+    "availability": "Record availability among observed care, not a response probability among eligible patients.",
+    "burden": "Four-level documentary category from every status-consistent record on the selected early day. Independent bound fallbacks, no interval intersection, no event index and no later outcome participate. Devices never supply ordinary-pad quantities.",
+    "nonconflicting_quantity_uncertain": "Compatible or all-missing evidence, including a crossing range beside a precise record. Missing rows never veto a compatible known category.",
+    "policies": "P1 window restriction, P2 first usable day, P3 narrow windows, P4 date-impact exclusion including nonselected uncertain dates, P5 released milestone rule. Each rebuilds the full robotic cohort. Differences combine measurement and population change.",
+    "selection": "Nearest target day inside the window, ties to the earlier day, then released event index. A patient-day holding both explicit states is unavailable; P0 permits another consistent day in the same window and flags the re-entry.",
+    "status": "Explicit Boolean pad status only, after the accepted D1 endpoint and device mask.",
+    "units": "Patients, observation rows and patient-day groups are distinct and are never summed together.",
+    "unknown": "Unknown country or age remains unknown. Nothing is recoded and nothing is imputed.",
+    "unresolved_quantity_evidence": "Invalid selected-day quantity evidence or valid intervals with an empty intersection, including disjoint exact counts."
+  },
+  "feasibility_count_gates": {
+    "age_complete_case_limit": 0.05,
+    "age_missing_fraction": 0.0,
+    "age_missing_in_observed_pairs": 0,
+    "age_missing_within_complete_case_limit": true,
+    "declared_age_handling": "complete_age_records_with_a_reported_changed_denominator",
+    "design_matrix_main": {
+      "column_count": 6,
+      "columns": [
+        "intercept",
+        "burden_two_or_more",
+        "burden_nonconflicting_quantity_uncertain",
+        "burden_unresolved_quantity_evidence",
+        "age_centred_65_per_10",
+        "country_united_states"
+      ],
+      "condition_number": 13.796,
+      "diagnostic_state": "covariate_structure_only_no_model_fitted",
+      "full_column_rank": true,
+      "rank": 6,
+      "rows": 226,
+      "smallest_singular_value": 1.3946,
+      "zero_variance_columns": []
+    },
+    "design_matrix_timing_sensitivity": {
+      "column_count": 8,
+      "columns": [
+        "intercept",
+        "burden_two_or_more",
+        "burden_nonconflicting_quantity_uncertain",
+        "burden_unresolved_quantity_evidence",
+        "age_centred_65_per_10",
+        "country_united_states",
+        "early_day_centred_90_per_30",
+        "year_day_centred_365_per_30"
+      ],
+      "condition_number": 13.8856,
+      "diagnostic_state": "covariate_structure_only_no_model_fitted",
+      "full_column_rank": true,
+      "rank": 8,
+      "rows": 226,
+      "smallest_singular_value": 1.392,
+      "zero_variance_columns": []
+    },
+    "empty_outcome_by_burden_cells": [
+      "unresolved_quantity_evidence|year_pad_free"
+    ],
+    "events_year_pad_free": 86,
+    "four_level_outcome_by_burden_cells": {
+      "nonconflicting_quantity_uncertain|year_pad_free": 4,
+      "nonconflicting_quantity_uncertain|year_pad_use": 19,
+      "one|year_pad_free": 58,
+      "one|year_pad_use": 52,
+      "two_or_more|year_pad_free": 24,
+      "two_or_more|year_pad_use": 67,
+      "unresolved_quantity_evidence|year_pad_free": 0,
+      "unresolved_quantity_evidence|year_pad_use": 2
+    },
+    "gates": [
+      {
+        "design_matrix": {
+          "column_count": 6,
+          "columns": [
+            "intercept",
+            "burden_two_or_more",
+            "burden_nonconflicting_quantity_uncertain",
+            "burden_unresolved_quantity_evidence",
+            "age_centred_65_per_10",
+            "country_united_states"
+          ],
+          "condition_number": 13.796,
+          "diagnostic_state": "covariate_structure_only_no_model_fitted",
+          "full_column_rank": true,
+          "rank": 6,
+          "rows": 226,
+          "smallest_singular_value": 1.3946,
+          "zero_variance_columns": []
+        },
+        "eligible_pairs": 226,
+        "eligible_pairs_by_country": {
+          "Poland": 89,
+          "United States": 137,
+          "unknown_or_other": 0
+        },
+        "eligible_rows": "observed_pairs_with_finite_age_and_named_country",
+        "empty_outcome_by_burden_cells": [
+          "unresolved_quantity_evidence|year_pad_free"
+        ],
+        "events": 86,
+        "failure_reasons": [
+          "empty_outcome_by_burden_cell_unresolved_quantity_evidence|year_pad_free"
+        ],
+        "key": "main_four_level_burden_age_country",
+        "label": "Three burden indicators, age and country.",
+        "minimum_per_slope_degree_of_freedom": 10,
+        "nonevents": 140,
+        "outcome_by_burden_cells": {
+          "nonconflicting_quantity_uncertain|year_pad_free": 4,
+          "nonconflicting_quantity_uncertain|year_pad_use": 19,
+          "one|year_pad_free": 58,
+          "one|year_pad_use": 52,
+          "two_or_more|year_pad_free": 24,
+          "two_or_more|year_pad_use": 67,
+          "unresolved_quantity_evidence|year_pad_free": 0,
+          "unresolved_quantity_evidence|year_pad_use": 2
+        },
+        "passes": false,
+        "required_each_arm": 50,
+        "slope_degrees_of_freedom": 5
+      },
+      {
+        "design_matrix": {
+          "column_count": 8,
+          "columns": [
+            "intercept",
+            "burden_two_or_more",
+            "burden_nonconflicting_quantity_uncertain",
+            "burden_unresolved_quantity_evidence",
+            "age_centred_65_per_10",
+            "country_united_states",
+            "early_day_centred_90_per_30",
+            "year_day_centred_365_per_30"
+          ],
+          "condition_number": 13.8856,
+          "diagnostic_state": "covariate_structure_only_no_model_fitted",
+          "full_column_rank": true,
+          "rank": 8,
+          "rows": 226,
+          "smallest_singular_value": 1.392,
+          "zero_variance_columns": []
+        },
+        "eligible_pairs": 226,
+        "eligible_pairs_by_country": {
+          "Poland": 89,
+          "United States": 137,
+          "unknown_or_other": 0
+        },
+        "eligible_rows": "observed_pairs_with_finite_age_named_country_and_finite_early_and_year_days",
+        "empty_outcome_by_burden_cells": [
+          "unresolved_quantity_evidence|year_pad_free"
+        ],
+        "events": 86,
+        "failure_reasons": [
+          "empty_outcome_by_burden_cell_unresolved_quantity_evidence|year_pad_free"
+        ],
+        "key": "timing_sensitivity_four_level",
+        "label": "Main structure plus early-day and year-day timing.",
+        "minimum_per_slope_degree_of_freedom": 10,
+        "nonevents": 140,
+        "outcome_by_burden_cells": {
+          "nonconflicting_quantity_uncertain|year_pad_free": 4,
+          "nonconflicting_quantity_uncertain|year_pad_use": 19,
+          "one|year_pad_free": 58,
+          "one|year_pad_use": 52,
+          "two_or_more|year_pad_free": 24,
+          "two_or_more|year_pad_use": 67,
+          "unresolved_quantity_evidence|year_pad_free": 0,
+          "unresolved_quantity_evidence|year_pad_use": 2
+        },
+        "passes": false,
+        "required_each_arm": 70,
+        "slope_degrees_of_freedom": 7
+      }
+    ],
+    "gates_failing": 2,
+    "gates_passing": 0,
+    "main_model_eligible_pairs": 226,
+    "main_model_pairs_lost_to_unavailable_assessment_days": 0,
+    "meaning": "Count adequacy and covariate structure only. No fit, probability, interval or test is produced.",
+    "nonevents_year_pad_use": 140,
+    "observed_pairs": 226,
+    "observed_pairs_by_country": {
+      "Poland": 89,
+      "United States": 137,
+      "unknown_or_other": 0
+    },
+    "observed_pairs_outside_the_main_model_subset": 0,
+    "passing_a_gate_licenses_a_model_fit": false,
+    "preliminary_structural_support_by_gate": {
+      "main_four_level_burden_age_country": false,
+      "timing_sensitivity_four_level": false
+    },
+    "structural_support_scope": "Preliminary structural support only: recomputed arm counts, complete outcome-by-burden cells, country support and covariate rank on each model's own eligible rows. Covariate overlap, functional form, separation, influence and leave-one-patient-out stability are assessed separately and afterwards, and a supported structure remains unfitted here.",
+    "superseded_three_level_note": "The current structure is the four-level documentary burden with five and seven slope degrees of freedom. The earlier three-level four and six slope screening is superseded for this target.",
+    "timing_model_eligible_pairs": 226
+  },
+  "limitations": [
+    "Derivation only. No probability, confidence interval, hypothesis test, model fit or bound on real data.",
+    "The opportunity-conditioned original primary remains held because administrative eligibility A is unknown.",
+    "Selected assessments describe documented care. They do not establish the true state on any day.",
+    "Policy differences are not confidence bounds, identification bounds or a range of clinical truth.",
+    "Count gates describe adequacy under the amendment rule. They license no model and no claim.",
+    "The superseded row-based burden inventory is historical accounting only."
+  ],
+  "model_fitted": false,
+  "p0_reference": {
+    "age_evidence": {
+      "age_finite": 460,
+      "age_missing_or_unusable": 0,
+      "early_users": 460,
+      "imputation_performed": false,
+      "profile_finite_only": {
+        "iqr_flagged": 1,
+        "max": 80.0,
+        "mean": 64.35,
+        "mean_influence_of_iqr_flags": -0.04,
+        "mean_without_iqr_flags_diagnostic_only": 64.39,
+        "median": 65.0,
+        "median_absolute_deviation": 4.0,
+        "min": 46.0,
+        "missing": 0,
+        "n": 460,
+        "nonfinite": 0,
+        "nonnumeric_nonblank": 0,
+        "q1": 60.0,
+        "q3": 69.0,
+        "sd": 6.3986,
+        "total": 460
+      }
+    },
+    "all_paired_transitions_including_early_pad_free": {
+      "early_pad_free|later_pad_free": 75,
+      "early_pad_free|later_pad_use": 8,
+      "early_pad_use|later_pad_free": 86,
+      "early_pad_use|later_pad_use": 140,
+      "paired_total": 309
+    },
+    "burden_by_country_by_year_state": {
+      "declared_cell_total": 460,
+      "nonconflicting_quantity_uncertain|Poland|not_observed": 9,
+      "nonconflicting_quantity_uncertain|Poland|pad_free": 0,
+      "nonconflicting_quantity_uncertain|Poland|pad_use": 8,
+      "nonconflicting_quantity_uncertain|United States|not_observed": 11,
+      "nonconflicting_quantity_uncertain|United States|pad_free": 4,
+      "nonconflicting_quantity_uncertain|United States|pad_use": 11,
+      "nonconflicting_quantity_uncertain|unknown_or_other|not_observed": 0,
+      "nonconflicting_quantity_uncertain|unknown_or_other|pad_free": 0,
+      "nonconflicting_quantity_uncertain|unknown_or_other|pad_use": 0,
+      "one|Poland|not_observed": 50,
+      "one|Poland|pad_free": 17,
+      "one|Poland|pad_use": 24,
+      "one|United States|not_observed": 74,
+      "one|United States|pad_free": 41,
+      "one|United States|pad_use": 28,
+      "one|unknown_or_other|not_observed": 0,
+      "one|unknown_or_other|pad_free": 0,
+      "one|unknown_or_other|pad_use": 0,
+      "rows_outside_declared_levels": 0,
+      "two_or_more|Poland|not_observed": 50,
+      "two_or_more|Poland|pad_free": 4,
+      "two_or_more|Poland|pad_use": 36,
+      "two_or_more|United States|not_observed": 37,
+      "two_or_more|United States|pad_free": 20,
+      "two_or_more|United States|pad_use": 31,
+      "two_or_more|unknown_or_other|not_observed": 0,
+      "two_or_more|unknown_or_other|pad_free": 0,
+      "two_or_more|unknown_or_other|pad_use": 0,
+      "unresolved_quantity_evidence|Poland|not_observed": 1,
+      "unresolved_quantity_evidence|Poland|pad_free": 0,
+      "unresolved_quantity_evidence|Poland|pad_use": 0,
+      "unresolved_quantity_evidence|United States|not_observed": 2,
+      "unresolved_quantity_evidence|United States|pad_free": 0,
+      "unresolved_quantity_evidence|United States|pad_use": 2,
+      "unresolved_quantity_evidence|unknown_or_other|not_observed": 0,
+      "unresolved_quantity_evidence|unknown_or_other|pad_free": 0,
+      "unresolved_quantity_evidence|unknown_or_other|pad_use": 0
+    },
+    "burden_diagnostics": {
+      "applicable": true,
+      "patients": 644,
+      "rows_excluded_status_unavailable_or_inconsistent": 2,
+      "selected_day_rows": 740,
+      "status_consistent_rows_used": 738
+    },
+    "coarse_surgery_year_counts": {
+      "2017": 1,
+      "2019": 2,
+      "2020": 4,
+      "2021": 22,
+      "2022": 45,
+      "2023": 91,
+      "2024": 184,
+      "2025": 107,
+      "2026": 4
+    },
+    "coarse_surgery_year_unknown": 0,
+    "country_consistency": {
+      "early_users": 460,
+      "patient_and_selected_event_country_agree": 460,
+      "patient_and_selected_event_country_disagree": 0,
+      "patient_country_missing_or_other": 0,
+      "patient_table_country": {
+        "Poland": 199,
+        "United States": 261,
+        "declared_total": 460,
+        "outside_declared_levels": 0,
+        "unknown_or_other": 0
+      },
+      "patients_with_multiple_distinct_event_countries_across_all_valid_rows": 0,
+      "patients_with_no_valid_event_row_country": 0,
+      "recoding": "none_applied_unknown_country_is_not_recoded_to_a_named_country",
+      "selected_early_event_country_known": 460,
+      "selected_early_event_country_unknown_or_other": 0
+    },
+    "early_user_subset_year_transitions": {
+      "early_pad_free|later_pad_free": 0,
+      "early_pad_free|later_pad_use": 0,
+      "early_pad_use|later_pad_free": 86,
+      "early_pad_use|later_pad_use": 140,
+      "paired_total": 226
+    },
+    "four_level_burden": {
+      "early_users": {
+        "declared_total": 460,
+        "nonconflicting_quantity_uncertain": 43,
+        "one": 234,
+        "outside_declared_levels": 0,
+        "two_or_more": 178,
+        "unresolved_quantity_evidence": 5
+      },
+      "evidence_flags": {
+        "all_missing_quantity_evidence": 27,
+        "category_stable_numeric_disagreement": 21,
+        "crossing_range_evidence": 14,
+        "device_evidence_present_never_used_as_ordinary": 1,
+        "incompatible_valid_intervals": 5,
+        "invalid_quantity_evidence": 0,
+        "missing_with_known_quantity_evidence": 54,
+        "partial_bound_evidence": 0
+      },
+      "evidence_flags_by_level": {
+        "nonconflicting_quantity_uncertain": {
+          "all_missing_quantity_evidence": 27,
+          "category_stable_numeric_disagreement": 2,
+          "crossing_range_evidence": 13,
+          "device_evidence_present_never_used_as_ordinary": 0,
+          "incompatible_valid_intervals": 0,
+          "invalid_quantity_evidence": 0,
+          "missing_with_known_quantity_evidence": 1,
+          "partial_bound_evidence": 0
+        },
+        "one": {
+          "all_missing_quantity_evidence": 0,
+          "category_stable_numeric_disagreement": 0,
+          "crossing_range_evidence": 0,
+          "device_evidence_present_never_used_as_ordinary": 0,
+          "incompatible_valid_intervals": 0,
+          "invalid_quantity_evidence": 0,
+          "missing_with_known_quantity_evidence": 29,
+          "partial_bound_evidence": 0
+        },
+        "two_or_more": {
+          "all_missing_quantity_evidence": 0,
+          "category_stable_numeric_disagreement": 17,
+          "crossing_range_evidence": 0,
+          "device_evidence_present_never_used_as_ordinary": 1,
+          "incompatible_valid_intervals": 0,
+          "invalid_quantity_evidence": 0,
+          "missing_with_known_quantity_evidence": 23,
+          "partial_bound_evidence": 0
+        },
+        "unresolved_quantity_evidence": {
+          "all_missing_quantity_evidence": 0,
+          "category_stable_numeric_disagreement": 2,
+          "crossing_range_evidence": 1,
+          "device_evidence_present_never_used_as_ordinary": 0,
+          "incompatible_valid_intervals": 5,
+          "invalid_quantity_evidence": 0,
+          "missing_with_known_quantity_evidence": 1,
+          "partial_bound_evidence": 0
+        }
+      },
+      "meaning": "Declared documentary exposure on the selected early day. Not an adjudicated clinical quantity and not a resolution of any contradictory record.",
+      "observed_year_pairs": {
+        "declared_total": 226,
+        "nonconflicting_quantity_uncertain": 23,
+        "one": 110,
+        "outside_declared_levels": 0,
+        "two_or_more": 91,
+        "unresolved_quantity_evidence": 2
+      }
+    },
+    "record_availability": {
+      "age_known_by_year_record_availability": {
+        "with_year_status": 226,
+        "without_year_status": 234
+      },
+      "by_country": {
+        "Poland": {
+          "early_users": 199,
+          "with_year_status": 89,
+          "without_year_status": 110
+        },
+        "United States": {
+          "early_users": 261,
+          "with_year_status": 137,
+          "without_year_status": 124
+        },
+        "unknown_or_other": {
+          "early_users": 0,
+          "with_year_status": 0,
+          "without_year_status": 0
+        }
+      },
+      "by_four_level_burden": {
+        "nonconflicting_quantity_uncertain": {
+          "early_users": 43,
+          "with_year_status": 23,
+          "without_year_status": 20
+        },
+        "one": {
+          "early_users": 234,
+          "with_year_status": 110,
+          "without_year_status": 124
+        },
+        "two_or_more": {
+          "early_users": 178,
+          "with_year_status": 91,
+          "without_year_status": 87
+        },
+        "unresolved_quantity_evidence": {
+          "early_users": 5,
+          "with_year_status": 2,
+          "without_year_status": 3
+        }
+      },
+      "early_day_profile_with_year_status": {
+        "iqr_flagged": 0,
+        "max": 118.0,
+        "mean": 91.1947,
+        "mean_influence_of_iqr_flags": 0.0,
+        "mean_without_iqr_flags_diagnostic_only": 91.1947,
+        "median": 93.0,
+        "median_absolute_deviation": 11.0,
+        "min": 60.0,
+        "missing": 0,
+        "n": 226,
+        "nonfinite": 0,
+        "nonnumeric_nonblank": 0,
+        "q1": 79.25,
+        "q3": 103.0,
+        "sd": 15.5208,
+        "total": 226
+      },
+      "early_day_profile_without_year_status": {
+        "iqr_flagged": 0,
+        "max": 120.0,
+        "mean": 89.0513,
+        "mean_influence_of_iqr_flags": 0.0,
+        "mean_without_iqr_flags_diagnostic_only": 89.0513,
+        "median": 91.5,
+        "median_absolute_deviation": 12.5,
+        "min": 60.0,
+        "missing": 0,
+        "n": 234,
+        "nonfinite": 0,
+        "nonnumeric_nonblank": 0,
+        "q1": 75.25,
+        "q3": 99.0,
+        "sd": 15.7141,
+        "total": 234
+      },
+      "early_users": 460,
+      "meaning": "Documented record availability among observed care. Not an opportunity-conditioned response fraction, not a weight and not a missing-outcome bound.",
+      "with_year_status": 226,
+      "without_year_status": 234,
+      "without_year_status_reasons": {
+        "conflicting_year_window_evidence_only": 1,
+        "no_valid_year_window_observation": 233
+      }
+    },
+    "six_month_all_paired_transitions": {
+      "early_pad_free|later_pad_free": 64,
+      "early_pad_free|later_pad_use": 6,
+      "early_pad_use|later_pad_free": 39,
+      "early_pad_use|later_pad_use": 159,
+      "paired_total": 268
+    },
+    "six_month_pairs": {
+      "by_country": {
+        "Poland": {
+          "early_users": 199,
+          "later_pad_free": 6,
+          "with_later_status": 83
+        },
+        "United States": {
+          "early_users": 261,
+          "later_pad_free": 33,
+          "with_later_status": 115
+        },
+        "unknown_or_other": {
+          "early_users": 0,
+          "later_pad_free": 0,
+          "with_later_status": 0
+        }
+      },
+      "by_four_level_burden": {
+        "nonconflicting_quantity_uncertain": {
+          "early_users": 43,
+          "later_pad_free": 0,
+          "with_later_status": 17
+        },
+        "one": {
+          "early_users": 234,
+          "later_pad_free": 31,
+          "with_later_status": 107
+        },
+        "two_or_more": {
+          "early_users": 178,
+          "later_pad_free": 8,
+          "with_later_status": 71
+        },
+        "unresolved_quantity_evidence": {
+          "early_users": 5,
+          "later_pad_free": 0,
+          "with_later_status": 3
+        }
+      },
+      "early_users": 460,
+      "early_users_with_later_status": 198,
+      "intermediate_visit_requirement": "none_missing_intermediate_assessments_do_not_prevent_a_pair",
+      "later_pad_free_in_early_user_pairs": 39,
+      "later_pad_use_in_early_user_pairs": 159
+    },
+    "two_year_all_paired_transitions": {
+      "early_pad_free|later_pad_free": 31,
+      "early_pad_free|later_pad_use": 2,
+      "early_pad_use|later_pad_free": 33,
+      "early_pad_use|later_pad_use": 51,
+      "paired_total": 117
+    },
+    "two_year_pairs": {
+      "by_country": {
+        "Poland": {
+          "early_users": 199,
+          "later_pad_free": 8,
+          "with_later_status": 28
+        },
+        "United States": {
+          "early_users": 261,
+          "later_pad_free": 25,
+          "with_later_status": 56
+        },
+        "unknown_or_other": {
+          "early_users": 0,
+          "later_pad_free": 0,
+          "with_later_status": 0
+        }
+      },
+      "by_four_level_burden": {
+        "nonconflicting_quantity_uncertain": {
+          "early_users": 43,
+          "later_pad_free": 3,
+          "with_later_status": 8
+        },
+        "one": {
+          "early_users": 234,
+          "later_pad_free": 21,
+          "with_later_status": 44
+        },
+        "two_or_more": {
+          "early_users": 178,
+          "later_pad_free": 9,
+          "with_later_status": 31
+        },
+        "unresolved_quantity_evidence": {
+          "early_users": 5,
+          "later_pad_free": 0,
+          "with_later_status": 1
+        }
+      },
+      "early_users": 460,
+      "early_users_with_later_status": 84,
+      "intermediate_visit_requirement": "none_missing_intermediate_assessments_do_not_prevent_a_pair",
+      "later_pad_free_in_early_user_pairs": 33,
+      "later_pad_use_in_early_user_pairs": 51
+    },
+    "window_diagnostics": {
+      "early": {
+        "conflicting_day_groups": 10,
+        "conflicting_day_patients": 10,
+        "conflicting_day_rows": 23,
+        "consistent_repeated_day_groups": 118,
+        "mode": "nearest",
+        "patient_day_groups": 825,
+        "patients_lost_after_conflicting_day_omission": 6,
+        "patients_reentering_on_an_alternative_consistent_day": 4,
+        "patients_with_any_known_status_day": 650,
+        "selected_pad_free": 184,
+        "selected_pad_use": 460,
+        "selected_patients": 644,
+        "target_day": 90,
+        "window_days": [
+          60,
+          120
+        ]
+      },
+      "six": {
+        "conflicting_day_groups": 3,
+        "conflicting_day_patients": 3,
+        "conflicting_day_rows": 6,
+        "consistent_repeated_day_groups": 47,
+        "mode": "nearest",
+        "patient_day_groups": 433,
+        "patients_lost_after_conflicting_day_omission": 2,
+        "patients_reentering_on_an_alternative_consistent_day": 1,
+        "patients_with_any_known_status_day": 387,
+        "selected_pad_free": 140,
+        "selected_pad_use": 245,
+        "selected_patients": 385,
+        "target_day": 180,
+        "window_days": [
+          150,
+          210
+        ]
+      },
+      "two_year": {
+        "conflicting_day_groups": 1,
+        "conflicting_day_patients": 1,
+        "conflicting_day_rows": 2,
+        "consistent_repeated_day_groups": 23,
+        "mode": "nearest",
+        "patient_day_groups": 242,
+        "patients_lost_after_conflicting_day_omission": 1,
+        "patients_reentering_on_an_alternative_consistent_day": 0,
+        "patients_with_any_known_status_day": 194,
+        "selected_pad_free": 107,
+        "selected_pad_use": 86,
+        "selected_patients": 193,
+        "target_day": 730,
+        "window_days": [
+          670,
+          790
+        ]
+      },
+      "year": {
+        "conflicting_day_groups": 6,
+        "conflicting_day_patients": 6,
+        "conflicting_day_rows": 13,
+        "consistent_repeated_day_groups": 56,
+        "mode": "nearest",
+        "patient_day_groups": 598,
+        "patients_lost_after_conflicting_day_omission": 2,
+        "patients_reentering_on_an_alternative_consistent_day": 4,
+        "patients_with_any_known_status_day": 483,
+        "selected_pad_free": 256,
+        "selected_pad_use": 225,
+        "selected_patients": 481,
+        "target_day": 365,
+        "window_days": [
+          305,
+          425
+        ]
+      }
+    }
+  },
+  "policies": {
+    "P0": {
+      "all_paired_transitions_including_early_pad_free": {
+        "early_pad_free|later_pad_free": 75,
+        "early_pad_free|later_pad_use": 8,
+        "early_pad_use|later_pad_free": 86,
+        "early_pad_use|later_pad_use": 140,
+        "paired_total": 309
+      },
+      "burden_by_country_by_year_state": {
+        "declared_cell_total": 460,
+        "nonconflicting_quantity_uncertain|Poland|not_observed": 9,
+        "nonconflicting_quantity_uncertain|Poland|pad_free": 0,
+        "nonconflicting_quantity_uncertain|Poland|pad_use": 8,
+        "nonconflicting_quantity_uncertain|United States|not_observed": 11,
+        "nonconflicting_quantity_uncertain|United States|pad_free": 4,
+        "nonconflicting_quantity_uncertain|United States|pad_use": 11,
+        "nonconflicting_quantity_uncertain|unknown_or_other|not_observed": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_free": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_use": 0,
+        "one|Poland|not_observed": 50,
+        "one|Poland|pad_free": 17,
+        "one|Poland|pad_use": 24,
+        "one|United States|not_observed": 74,
+        "one|United States|pad_free": 41,
+        "one|United States|pad_use": 28,
+        "one|unknown_or_other|not_observed": 0,
+        "one|unknown_or_other|pad_free": 0,
+        "one|unknown_or_other|pad_use": 0,
+        "rows_outside_declared_levels": 0,
+        "two_or_more|Poland|not_observed": 50,
+        "two_or_more|Poland|pad_free": 4,
+        "two_or_more|Poland|pad_use": 36,
+        "two_or_more|United States|not_observed": 37,
+        "two_or_more|United States|pad_free": 20,
+        "two_or_more|United States|pad_use": 31,
+        "two_or_more|unknown_or_other|not_observed": 0,
+        "two_or_more|unknown_or_other|pad_free": 0,
+        "two_or_more|unknown_or_other|pad_use": 0,
+        "unresolved_quantity_evidence|Poland|not_observed": 1,
+        "unresolved_quantity_evidence|Poland|pad_free": 0,
+        "unresolved_quantity_evidence|Poland|pad_use": 0,
+        "unresolved_quantity_evidence|United States|not_observed": 2,
+        "unresolved_quantity_evidence|United States|pad_free": 0,
+        "unresolved_quantity_evidence|United States|pad_use": 2,
+        "unresolved_quantity_evidence|unknown_or_other|not_observed": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_free": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_use": 0
+      },
+      "burden_diagnostics": {
+        "applicable": true,
+        "patients": 644,
+        "rows_excluded_status_unavailable_or_inconsistent": 2,
+        "selected_day_rows": 740,
+        "status_consistent_rows_used": 738
+      },
+      "comparison_with_p0": {
+        "coupled_patient_changes": {
+          "coupled_early_burden_level_changed": 0,
+          "early_status_changed": 0,
+          "patients_selected_as_early_users_under_both": 460,
+          "patients_selected_in_the_early_window_under_both": 644,
+          "selected_early_day_changed": 0,
+          "selected_year_day_changed": 0,
+          "year_status_label_changed_including_availability": 0
+        },
+        "early_pad_free": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 184,
+          "policy": 184,
+          "reference_p0": 184
+        },
+        "early_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 644,
+          "policy": 644,
+          "reference_p0": 644
+        },
+        "early_users": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 460,
+          "policy": 460,
+          "reference_p0": 460
+        },
+        "early_users_with_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 226,
+          "policy": 226,
+          "reference_p0": 226
+        },
+        "paired_early_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 309,
+          "policy": 309,
+          "reference_p0": 309
+        },
+        "year_padfree_in_early_user_pairs": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 86,
+          "policy": 86,
+          "reference_p0": 86
+        },
+        "year_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 481,
+          "policy": 481,
+          "reference_p0": 481
+        }
+      },
+      "denominators": {
+        "early_pad_free": 184,
+        "early_status_known": 644,
+        "early_users": 460,
+        "early_users_with_six": 198,
+        "early_users_with_two_year": 84,
+        "early_users_with_year": 226,
+        "early_users_without_year": 234,
+        "paired_early_six": 268,
+        "paired_early_two_year": 117,
+        "paired_early_year": 309,
+        "six_padfree_in_early_user_pairs": 39,
+        "six_status_known": 385,
+        "two_year_padfree_in_early_user_pairs": 33,
+        "two_year_status_known": 193,
+        "year_padfree_in_early_user_pairs": 86,
+        "year_status_known": 481
+      },
+      "early_status_counts": {
+        "pad_free": 184,
+        "pad_use": 460
+      },
+      "early_user_subset_year_counts": {
+        "early_users_with_year_status": 226,
+        "year_pad_free": 86,
+        "year_pad_use": 140
+      },
+      "excluded_patients_before_selection": 0,
+      "four_level_burden": {
+        "declared_total": 460,
+        "nonconflicting_quantity_uncertain": 43,
+        "one": 234,
+        "outside_declared_levels": 0,
+        "two_or_more": 178,
+        "unresolved_quantity_evidence": 5
+      },
+      "observation_rule": "exact_window_day_selection",
+      "window_diagnostics": {
+        "early": {
+          "conflicting_day_groups": 10,
+          "conflicting_day_patients": 10,
+          "conflicting_day_rows": 23,
+          "consistent_repeated_day_groups": 118,
+          "mode": "nearest",
+          "patient_day_groups": 825,
+          "patients_lost_after_conflicting_day_omission": 6,
+          "patients_reentering_on_an_alternative_consistent_day": 4,
+          "patients_with_any_known_status_day": 650,
+          "selected_pad_free": 184,
+          "selected_pad_use": 460,
+          "selected_patients": 644,
+          "target_day": 90,
+          "window_days": [
+            60,
+            120
+          ]
+        },
+        "six": {
+          "conflicting_day_groups": 3,
+          "conflicting_day_patients": 3,
+          "conflicting_day_rows": 6,
+          "consistent_repeated_day_groups": 47,
+          "mode": "nearest",
+          "patient_day_groups": 433,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 1,
+          "patients_with_any_known_status_day": 387,
+          "selected_pad_free": 140,
+          "selected_pad_use": 245,
+          "selected_patients": 385,
+          "target_day": 180,
+          "window_days": [
+            150,
+            210
+          ]
+        },
+        "two_year": {
+          "conflicting_day_groups": 1,
+          "conflicting_day_patients": 1,
+          "conflicting_day_rows": 2,
+          "consistent_repeated_day_groups": 23,
+          "mode": "nearest",
+          "patient_day_groups": 242,
+          "patients_lost_after_conflicting_day_omission": 1,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 194,
+          "selected_pad_free": 107,
+          "selected_pad_use": 86,
+          "selected_patients": 193,
+          "target_day": 730,
+          "window_days": [
+            670,
+            790
+          ]
+        },
+        "year": {
+          "conflicting_day_groups": 6,
+          "conflicting_day_patients": 6,
+          "conflicting_day_rows": 13,
+          "consistent_repeated_day_groups": 56,
+          "mode": "nearest",
+          "patient_day_groups": 598,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 4,
+          "patients_with_any_known_status_day": 483,
+          "selected_pad_free": 256,
+          "selected_pad_use": 225,
+          "selected_patients": 481,
+          "target_day": 365,
+          "window_days": [
+            305,
+            425
+          ]
+        }
+      }
+    },
+    "P1": {
+      "all_paired_transitions_including_early_pad_free": {
+        "early_pad_free|later_pad_free": 75,
+        "early_pad_free|later_pad_use": 8,
+        "early_pad_use|later_pad_free": 82,
+        "early_pad_use|later_pad_use": 139,
+        "paired_total": 304
+      },
+      "burden_by_country_by_year_state": {
+        "declared_cell_total": 457,
+        "nonconflicting_quantity_uncertain|Poland|not_observed": 9,
+        "nonconflicting_quantity_uncertain|Poland|pad_free": 0,
+        "nonconflicting_quantity_uncertain|Poland|pad_use": 8,
+        "nonconflicting_quantity_uncertain|United States|not_observed": 11,
+        "nonconflicting_quantity_uncertain|United States|pad_free": 4,
+        "nonconflicting_quantity_uncertain|United States|pad_use": 11,
+        "nonconflicting_quantity_uncertain|unknown_or_other|not_observed": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_free": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_use": 0,
+        "one|Poland|not_observed": 50,
+        "one|Poland|pad_free": 16,
+        "one|Poland|pad_use": 24,
+        "one|United States|not_observed": 76,
+        "one|United States|pad_free": 38,
+        "one|United States|pad_use": 27,
+        "one|unknown_or_other|not_observed": 0,
+        "one|unknown_or_other|pad_free": 0,
+        "one|unknown_or_other|pad_use": 0,
+        "rows_outside_declared_levels": 0,
+        "two_or_more|Poland|not_observed": 50,
+        "two_or_more|Poland|pad_free": 4,
+        "two_or_more|Poland|pad_use": 36,
+        "two_or_more|United States|not_observed": 37,
+        "two_or_more|United States|pad_free": 20,
+        "two_or_more|United States|pad_use": 31,
+        "two_or_more|unknown_or_other|not_observed": 0,
+        "two_or_more|unknown_or_other|pad_free": 0,
+        "two_or_more|unknown_or_other|pad_use": 0,
+        "unresolved_quantity_evidence|Poland|not_observed": 1,
+        "unresolved_quantity_evidence|Poland|pad_free": 0,
+        "unresolved_quantity_evidence|Poland|pad_use": 0,
+        "unresolved_quantity_evidence|United States|not_observed": 2,
+        "unresolved_quantity_evidence|United States|pad_free": 0,
+        "unresolved_quantity_evidence|United States|pad_use": 2,
+        "unresolved_quantity_evidence|unknown_or_other|not_observed": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_free": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_use": 0
+      },
+      "burden_diagnostics": {
+        "applicable": true,
+        "patients": 640,
+        "rows_excluded_status_unavailable_or_inconsistent": 2,
+        "selected_day_rows": 735,
+        "status_consistent_rows_used": 733
+      },
+      "comparison_with_p0": {
+        "coupled_patient_changes": {
+          "coupled_early_burden_level_changed": 0,
+          "early_status_changed": 0,
+          "patients_selected_as_early_users_under_both": 457,
+          "patients_selected_in_the_early_window_under_both": 640,
+          "selected_early_day_changed": 0,
+          "selected_year_day_changed": 0,
+          "year_status_label_changed_including_availability": 3
+        },
+        "early_pad_free": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 1,
+          "intersection": 183,
+          "policy": 183,
+          "reference_p0": 184
+        },
+        "early_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 4,
+          "intersection": 640,
+          "policy": 640,
+          "reference_p0": 644
+        },
+        "early_users": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 3,
+          "intersection": 457,
+          "policy": 457,
+          "reference_p0": 460
+        },
+        "early_users_with_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 5,
+          "intersection": 221,
+          "policy": 221,
+          "reference_p0": 226
+        },
+        "paired_early_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 5,
+          "intersection": 304,
+          "policy": 304,
+          "reference_p0": 309
+        },
+        "year_padfree_in_early_user_pairs": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 4,
+          "intersection": 82,
+          "policy": 82,
+          "reference_p0": 86
+        },
+        "year_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 4,
+          "intersection": 477,
+          "policy": 477,
+          "reference_p0": 481
+        }
+      },
+      "denominators": {
+        "early_pad_free": 183,
+        "early_status_known": 640,
+        "early_users": 457,
+        "early_users_with_six": 197,
+        "early_users_with_two_year": 83,
+        "early_users_with_year": 221,
+        "early_users_without_year": 236,
+        "paired_early_six": 266,
+        "paired_early_two_year": 116,
+        "paired_early_year": 304,
+        "six_padfree_in_early_user_pairs": 39,
+        "six_status_known": 384,
+        "two_year_padfree_in_early_user_pairs": 33,
+        "two_year_status_known": 193,
+        "year_padfree_in_early_user_pairs": 82,
+        "year_status_known": 477
+      },
+      "early_status_counts": {
+        "pad_free": 183,
+        "pad_use": 457
+      },
+      "early_user_subset_year_counts": {
+        "early_users_with_year_status": 221,
+        "year_pad_free": 82,
+        "year_pad_use": 139
+      },
+      "excluded_patients_before_selection": 0,
+      "four_level_burden": {
+        "declared_total": 457,
+        "nonconflicting_quantity_uncertain": 43,
+        "one": 231,
+        "outside_declared_levels": 0,
+        "two_or_more": 178,
+        "unresolved_quantity_evidence": 5
+      },
+      "observation_rule": "exact_window_day_selection",
+      "window_diagnostics": {
+        "early": {
+          "conflicting_day_groups": 10,
+          "conflicting_day_patients": 10,
+          "conflicting_day_rows": 23,
+          "consistent_repeated_day_groups": 118,
+          "mode": "window_restricted",
+          "patient_day_groups": 825,
+          "patients_lost_after_conflicting_day_omission": 10,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 650,
+          "selected_pad_free": 183,
+          "selected_pad_use": 457,
+          "selected_patients": 640,
+          "target_day": 90,
+          "window_days": [
+            60,
+            120
+          ]
+        },
+        "six": {
+          "conflicting_day_groups": 3,
+          "conflicting_day_patients": 3,
+          "conflicting_day_rows": 6,
+          "consistent_repeated_day_groups": 47,
+          "mode": "window_restricted",
+          "patient_day_groups": 433,
+          "patients_lost_after_conflicting_day_omission": 3,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 387,
+          "selected_pad_free": 140,
+          "selected_pad_use": 244,
+          "selected_patients": 384,
+          "target_day": 180,
+          "window_days": [
+            150,
+            210
+          ]
+        },
+        "two_year": {
+          "conflicting_day_groups": 1,
+          "conflicting_day_patients": 1,
+          "conflicting_day_rows": 2,
+          "consistent_repeated_day_groups": 23,
+          "mode": "window_restricted",
+          "patient_day_groups": 242,
+          "patients_lost_after_conflicting_day_omission": 1,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 194,
+          "selected_pad_free": 107,
+          "selected_pad_use": 86,
+          "selected_patients": 193,
+          "target_day": 730,
+          "window_days": [
+            670,
+            790
+          ]
+        },
+        "year": {
+          "conflicting_day_groups": 6,
+          "conflicting_day_patients": 6,
+          "conflicting_day_rows": 13,
+          "consistent_repeated_day_groups": 56,
+          "mode": "window_restricted",
+          "patient_day_groups": 598,
+          "patients_lost_after_conflicting_day_omission": 6,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 483,
+          "selected_pad_free": 254,
+          "selected_pad_use": 223,
+          "selected_patients": 477,
+          "target_day": 365,
+          "window_days": [
+            305,
+            425
+          ]
+        }
+      }
+    },
+    "P2": {
+      "all_paired_transitions_including_early_pad_free": {
+        "early_pad_free|later_pad_free": 74,
+        "early_pad_free|later_pad_use": 9,
+        "early_pad_use|later_pad_free": 82,
+        "early_pad_use|later_pad_use": 144,
+        "paired_total": 309
+      },
+      "burden_by_country_by_year_state": {
+        "declared_cell_total": 460,
+        "nonconflicting_quantity_uncertain|Poland|not_observed": 8,
+        "nonconflicting_quantity_uncertain|Poland|pad_free": 0,
+        "nonconflicting_quantity_uncertain|Poland|pad_use": 7,
+        "nonconflicting_quantity_uncertain|United States|not_observed": 10,
+        "nonconflicting_quantity_uncertain|United States|pad_free": 5,
+        "nonconflicting_quantity_uncertain|United States|pad_use": 11,
+        "nonconflicting_quantity_uncertain|unknown_or_other|not_observed": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_free": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_use": 0,
+        "one|Poland|not_observed": 50,
+        "one|Poland|pad_free": 17,
+        "one|Poland|pad_use": 23,
+        "one|United States|not_observed": 73,
+        "one|United States|pad_free": 38,
+        "one|United States|pad_use": 30,
+        "one|unknown_or_other|not_observed": 0,
+        "one|unknown_or_other|pad_free": 0,
+        "one|unknown_or_other|pad_use": 0,
+        "rows_outside_declared_levels": 0,
+        "two_or_more|Poland|not_observed": 50,
+        "two_or_more|Poland|pad_free": 4,
+        "two_or_more|Poland|pad_use": 38,
+        "two_or_more|United States|not_observed": 40,
+        "two_or_more|United States|pad_free": 18,
+        "two_or_more|United States|pad_use": 33,
+        "two_or_more|unknown_or_other|not_observed": 0,
+        "two_or_more|unknown_or_other|pad_free": 0,
+        "two_or_more|unknown_or_other|pad_use": 0,
+        "unresolved_quantity_evidence|Poland|not_observed": 2,
+        "unresolved_quantity_evidence|Poland|pad_free": 0,
+        "unresolved_quantity_evidence|Poland|pad_use": 0,
+        "unresolved_quantity_evidence|United States|not_observed": 1,
+        "unresolved_quantity_evidence|United States|pad_free": 0,
+        "unresolved_quantity_evidence|United States|pad_use": 2,
+        "unresolved_quantity_evidence|unknown_or_other|not_observed": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_free": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_use": 0
+      },
+      "burden_diagnostics": {
+        "applicable": true,
+        "patients": 644,
+        "rows_excluded_status_unavailable_or_inconsistent": 2,
+        "selected_day_rows": 740,
+        "status_consistent_rows_used": 738
+      },
+      "comparison_with_p0": {
+        "coupled_patient_changes": {
+          "coupled_early_burden_level_changed": 8,
+          "early_status_changed": 0,
+          "patients_selected_as_early_users_under_both": 460,
+          "patients_selected_in_the_early_window_under_both": 644,
+          "selected_early_day_changed": 49,
+          "selected_year_day_changed": 56,
+          "year_status_label_changed_including_availability": 6
+        },
+        "early_pad_free": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 184,
+          "policy": 184,
+          "reference_p0": 184
+        },
+        "early_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 644,
+          "policy": 644,
+          "reference_p0": 644
+        },
+        "early_users": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 460,
+          "policy": 460,
+          "reference_p0": 460
+        },
+        "early_users_with_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 226,
+          "policy": 226,
+          "reference_p0": 226
+        },
+        "paired_early_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 309,
+          "policy": 309,
+          "reference_p0": 309
+        },
+        "year_padfree_in_early_user_pairs": {
+          "entering_under_policy": 1,
+          "exiting_under_policy": 5,
+          "intersection": 81,
+          "policy": 82,
+          "reference_p0": 86
+        },
+        "year_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 481,
+          "policy": 481,
+          "reference_p0": 481
+        }
+      },
+      "denominators": {
+        "early_pad_free": 184,
+        "early_status_known": 644,
+        "early_users": 460,
+        "early_users_with_six": 198,
+        "early_users_with_two_year": 84,
+        "early_users_with_year": 226,
+        "early_users_without_year": 234,
+        "paired_early_six": 268,
+        "paired_early_two_year": 117,
+        "paired_early_year": 309,
+        "six_padfree_in_early_user_pairs": 39,
+        "six_status_known": 385,
+        "two_year_padfree_in_early_user_pairs": 32,
+        "two_year_status_known": 193,
+        "year_padfree_in_early_user_pairs": 82,
+        "year_status_known": 481
+      },
+      "early_status_counts": {
+        "pad_free": 184,
+        "pad_use": 460
+      },
+      "early_user_subset_year_counts": {
+        "early_users_with_year_status": 226,
+        "year_pad_free": 82,
+        "year_pad_use": 144
+      },
+      "excluded_patients_before_selection": 0,
+      "four_level_burden": {
+        "declared_total": 460,
+        "nonconflicting_quantity_uncertain": 41,
+        "one": 231,
+        "outside_declared_levels": 0,
+        "two_or_more": 183,
+        "unresolved_quantity_evidence": 5
+      },
+      "observation_rule": "exact_window_day_selection",
+      "window_diagnostics": {
+        "early": {
+          "conflicting_day_groups": 10,
+          "conflicting_day_patients": 10,
+          "conflicting_day_rows": 23,
+          "consistent_repeated_day_groups": 118,
+          "mode": "first",
+          "patient_day_groups": 825,
+          "patients_lost_after_conflicting_day_omission": 6,
+          "patients_reentering_on_an_alternative_consistent_day": 4,
+          "patients_with_any_known_status_day": 650,
+          "selected_pad_free": 184,
+          "selected_pad_use": 460,
+          "selected_patients": 644,
+          "target_day": 90,
+          "window_days": [
+            60,
+            120
+          ]
+        },
+        "six": {
+          "conflicting_day_groups": 3,
+          "conflicting_day_patients": 3,
+          "conflicting_day_rows": 6,
+          "consistent_repeated_day_groups": 47,
+          "mode": "first",
+          "patient_day_groups": 433,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 1,
+          "patients_with_any_known_status_day": 387,
+          "selected_pad_free": 141,
+          "selected_pad_use": 244,
+          "selected_patients": 385,
+          "target_day": 180,
+          "window_days": [
+            150,
+            210
+          ]
+        },
+        "two_year": {
+          "conflicting_day_groups": 1,
+          "conflicting_day_patients": 1,
+          "conflicting_day_rows": 2,
+          "consistent_repeated_day_groups": 23,
+          "mode": "first",
+          "patient_day_groups": 242,
+          "patients_lost_after_conflicting_day_omission": 1,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 194,
+          "selected_pad_free": 105,
+          "selected_pad_use": 88,
+          "selected_patients": 193,
+          "target_day": 730,
+          "window_days": [
+            670,
+            790
+          ]
+        },
+        "year": {
+          "conflicting_day_groups": 6,
+          "conflicting_day_patients": 6,
+          "conflicting_day_rows": 13,
+          "consistent_repeated_day_groups": 56,
+          "mode": "first",
+          "patient_day_groups": 598,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 4,
+          "patients_with_any_known_status_day": 483,
+          "selected_pad_free": 251,
+          "selected_pad_use": 230,
+          "selected_patients": 481,
+          "target_day": 365,
+          "window_days": [
+            305,
+            425
+          ]
+        }
+      }
+    },
+    "P3": {
+      "all_paired_transitions_including_early_pad_free": {
+        "early_pad_free|later_pad_free": 24,
+        "early_pad_free|later_pad_use": 3,
+        "early_pad_use|later_pad_free": 35,
+        "early_pad_use|later_pad_use": 54,
+        "paired_total": 116
+      },
+      "burden_by_country_by_year_state": {
+        "declared_cell_total": 277,
+        "nonconflicting_quantity_uncertain|Poland|not_observed": 9,
+        "nonconflicting_quantity_uncertain|Poland|pad_free": 0,
+        "nonconflicting_quantity_uncertain|Poland|pad_use": 3,
+        "nonconflicting_quantity_uncertain|United States|not_observed": 10,
+        "nonconflicting_quantity_uncertain|United States|pad_free": 1,
+        "nonconflicting_quantity_uncertain|United States|pad_use": 5,
+        "nonconflicting_quantity_uncertain|unknown_or_other|not_observed": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_free": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_use": 0,
+        "one|Poland|not_observed": 40,
+        "one|Poland|pad_free": 4,
+        "one|Poland|pad_use": 10,
+        "one|United States|not_observed": 60,
+        "one|United States|pad_free": 21,
+        "one|United States|pad_use": 9,
+        "one|unknown_or_other|not_observed": 0,
+        "one|unknown_or_other|pad_free": 0,
+        "one|unknown_or_other|pad_use": 0,
+        "rows_outside_declared_levels": 0,
+        "two_or_more|Poland|not_observed": 28,
+        "two_or_more|Poland|pad_free": 1,
+        "two_or_more|Poland|pad_use": 11,
+        "two_or_more|United States|not_observed": 38,
+        "two_or_more|United States|pad_free": 8,
+        "two_or_more|United States|pad_use": 14,
+        "two_or_more|unknown_or_other|not_observed": 0,
+        "two_or_more|unknown_or_other|pad_free": 0,
+        "two_or_more|unknown_or_other|pad_use": 0,
+        "unresolved_quantity_evidence|Poland|not_observed": 1,
+        "unresolved_quantity_evidence|Poland|pad_free": 0,
+        "unresolved_quantity_evidence|Poland|pad_use": 0,
+        "unresolved_quantity_evidence|United States|not_observed": 2,
+        "unresolved_quantity_evidence|United States|pad_free": 0,
+        "unresolved_quantity_evidence|United States|pad_use": 2,
+        "unresolved_quantity_evidence|unknown_or_other|not_observed": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_free": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_use": 0
+      },
+      "burden_diagnostics": {
+        "applicable": true,
+        "patients": 393,
+        "rows_excluded_status_unavailable_or_inconsistent": 2,
+        "selected_day_rows": 448,
+        "status_consistent_rows_used": 446
+      },
+      "comparison_with_p0": {
+        "coupled_patient_changes": {
+          "coupled_early_burden_level_changed": 0,
+          "early_status_changed": 0,
+          "patients_selected_as_early_users_under_both": 277,
+          "patients_selected_in_the_early_window_under_both": 393,
+          "selected_early_day_changed": 0,
+          "selected_year_day_changed": 0,
+          "year_status_label_changed_including_availability": 49
+        },
+        "early_pad_free": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 68,
+          "intersection": 116,
+          "policy": 116,
+          "reference_p0": 184
+        },
+        "early_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 251,
+          "intersection": 393,
+          "policy": 393,
+          "reference_p0": 644
+        },
+        "early_users": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 183,
+          "intersection": 277,
+          "policy": 277,
+          "reference_p0": 460
+        },
+        "early_users_with_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 137,
+          "intersection": 89,
+          "policy": 89,
+          "reference_p0": 226
+        },
+        "paired_early_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 193,
+          "intersection": 116,
+          "policy": 116,
+          "reference_p0": 309
+        },
+        "year_padfree_in_early_user_pairs": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 51,
+          "intersection": 35,
+          "policy": 35,
+          "reference_p0": 86
+        },
+        "year_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 201,
+          "intersection": 280,
+          "policy": 280,
+          "reference_p0": 481
+        }
+      },
+      "denominators": {
+        "early_pad_free": 116,
+        "early_status_known": 393,
+        "early_users": 277,
+        "early_users_with_six": 125,
+        "early_users_with_two_year": 57,
+        "early_users_with_year": 89,
+        "early_users_without_year": 188,
+        "paired_early_six": 170,
+        "paired_early_two_year": 79,
+        "paired_early_year": 116,
+        "six_padfree_in_early_user_pairs": 28,
+        "six_status_known": 385,
+        "two_year_padfree_in_early_user_pairs": 22,
+        "two_year_status_known": 193,
+        "year_padfree_in_early_user_pairs": 35,
+        "year_status_known": 280
+      },
+      "early_status_counts": {
+        "pad_free": 116,
+        "pad_use": 277
+      },
+      "early_user_subset_year_counts": {
+        "early_users_with_year_status": 89,
+        "year_pad_free": 35,
+        "year_pad_use": 54
+      },
+      "excluded_patients_before_selection": 0,
+      "four_level_burden": {
+        "declared_total": 277,
+        "nonconflicting_quantity_uncertain": 28,
+        "one": 144,
+        "outside_declared_levels": 0,
+        "two_or_more": 100,
+        "unresolved_quantity_evidence": 5
+      },
+      "observation_rule": "exact_window_day_selection",
+      "window_diagnostics": {
+        "early": {
+          "conflicting_day_groups": 7,
+          "conflicting_day_patients": 7,
+          "conflicting_day_rows": 16,
+          "consistent_repeated_day_groups": 62,
+          "mode": "nearest",
+          "patient_day_groups": 473,
+          "patients_lost_after_conflicting_day_omission": 6,
+          "patients_reentering_on_an_alternative_consistent_day": 1,
+          "patients_with_any_known_status_day": 399,
+          "selected_pad_free": 116,
+          "selected_pad_use": 277,
+          "selected_patients": 393,
+          "target_day": 90,
+          "window_days": [
+            75,
+            105
+          ]
+        },
+        "six": {
+          "conflicting_day_groups": 3,
+          "conflicting_day_patients": 3,
+          "conflicting_day_rows": 6,
+          "consistent_repeated_day_groups": 47,
+          "mode": "nearest",
+          "patient_day_groups": 433,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 1,
+          "patients_with_any_known_status_day": 387,
+          "selected_pad_free": 140,
+          "selected_pad_use": 245,
+          "selected_patients": 385,
+          "target_day": 180,
+          "window_days": [
+            150,
+            210
+          ]
+        },
+        "two_year": {
+          "conflicting_day_groups": 1,
+          "conflicting_day_patients": 1,
+          "conflicting_day_rows": 2,
+          "consistent_repeated_day_groups": 23,
+          "mode": "nearest",
+          "patient_day_groups": 242,
+          "patients_lost_after_conflicting_day_omission": 1,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 194,
+          "selected_pad_free": 107,
+          "selected_pad_use": 86,
+          "selected_patients": 193,
+          "target_day": 730,
+          "window_days": [
+            670,
+            790
+          ]
+        },
+        "year": {
+          "conflicting_day_groups": 3,
+          "conflicting_day_patients": 3,
+          "conflicting_day_rows": 7,
+          "consistent_repeated_day_groups": 26,
+          "mode": "nearest",
+          "patient_day_groups": 323,
+          "patients_lost_after_conflicting_day_omission": 1,
+          "patients_reentering_on_an_alternative_consistent_day": 2,
+          "patients_with_any_known_status_day": 281,
+          "selected_pad_free": 137,
+          "selected_pad_use": 143,
+          "selected_patients": 280,
+          "target_day": 365,
+          "window_days": [
+            335,
+            395
+          ]
+        }
+      }
+    },
+    "P4": {
+      "all_paired_transitions_including_early_pad_free": {
+        "early_pad_free|later_pad_free": 75,
+        "early_pad_free|later_pad_use": 8,
+        "early_pad_use|later_pad_free": 86,
+        "early_pad_use|later_pad_use": 135,
+        "paired_total": 304
+      },
+      "burden_by_country_by_year_state": {
+        "declared_cell_total": 445,
+        "nonconflicting_quantity_uncertain|Poland|not_observed": 9,
+        "nonconflicting_quantity_uncertain|Poland|pad_free": 0,
+        "nonconflicting_quantity_uncertain|Poland|pad_use": 7,
+        "nonconflicting_quantity_uncertain|United States|not_observed": 11,
+        "nonconflicting_quantity_uncertain|United States|pad_free": 4,
+        "nonconflicting_quantity_uncertain|United States|pad_use": 11,
+        "nonconflicting_quantity_uncertain|unknown_or_other|not_observed": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_free": 0,
+        "nonconflicting_quantity_uncertain|unknown_or_other|pad_use": 0,
+        "one|Poland|not_observed": 48,
+        "one|Poland|pad_free": 17,
+        "one|Poland|pad_use": 22,
+        "one|United States|not_observed": 74,
+        "one|United States|pad_free": 41,
+        "one|United States|pad_use": 28,
+        "one|unknown_or_other|not_observed": 0,
+        "one|unknown_or_other|pad_free": 0,
+        "one|unknown_or_other|pad_use": 0,
+        "rows_outside_declared_levels": 0,
+        "two_or_more|Poland|not_observed": 42,
+        "two_or_more|Poland|pad_free": 4,
+        "two_or_more|Poland|pad_use": 34,
+        "two_or_more|United States|not_observed": 37,
+        "two_or_more|United States|pad_free": 20,
+        "two_or_more|United States|pad_use": 31,
+        "two_or_more|unknown_or_other|not_observed": 0,
+        "two_or_more|unknown_or_other|pad_free": 0,
+        "two_or_more|unknown_or_other|pad_use": 0,
+        "unresolved_quantity_evidence|Poland|not_observed": 1,
+        "unresolved_quantity_evidence|Poland|pad_free": 0,
+        "unresolved_quantity_evidence|Poland|pad_use": 0,
+        "unresolved_quantity_evidence|United States|not_observed": 2,
+        "unresolved_quantity_evidence|United States|pad_free": 0,
+        "unresolved_quantity_evidence|United States|pad_use": 2,
+        "unresolved_quantity_evidence|unknown_or_other|not_observed": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_free": 0,
+        "unresolved_quantity_evidence|unknown_or_other|pad_use": 0
+      },
+      "burden_diagnostics": {
+        "applicable": true,
+        "patients": 629,
+        "rows_excluded_status_unavailable_or_inconsistent": 2,
+        "selected_day_rows": 723,
+        "status_consistent_rows_used": 721
+      },
+      "comparison_with_p0": {
+        "coupled_patient_changes": {
+          "coupled_early_burden_level_changed": 0,
+          "early_status_changed": 0,
+          "patients_selected_as_early_users_under_both": 445,
+          "patients_selected_in_the_early_window_under_both": 629,
+          "selected_early_day_changed": 0,
+          "selected_year_day_changed": 0,
+          "year_status_label_changed_including_availability": 0
+        },
+        "early_pad_free": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 184,
+          "policy": 184,
+          "reference_p0": 184
+        },
+        "early_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 15,
+          "intersection": 629,
+          "policy": 629,
+          "reference_p0": 644
+        },
+        "early_users": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 15,
+          "intersection": 445,
+          "policy": 445,
+          "reference_p0": 460
+        },
+        "early_users_with_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 5,
+          "intersection": 221,
+          "policy": 221,
+          "reference_p0": 226
+        },
+        "paired_early_year": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 5,
+          "intersection": 304,
+          "policy": 304,
+          "reference_p0": 309
+        },
+        "year_padfree_in_early_user_pairs": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 0,
+          "intersection": 86,
+          "policy": 86,
+          "reference_p0": 86
+        },
+        "year_status_known": {
+          "entering_under_policy": 0,
+          "exiting_under_policy": 9,
+          "intersection": 472,
+          "policy": 472,
+          "reference_p0": 481
+        }
+      },
+      "date_impact_diagnostics": {
+        "early_window_date_impact_patients": 19,
+        "either_window_date_impact_patients": 24,
+        "year_window_date_impact_patients": 15
+      },
+      "denominators": {
+        "early_pad_free": 184,
+        "early_status_known": 629,
+        "early_users": 445,
+        "early_users_with_six": 190,
+        "early_users_with_two_year": 81,
+        "early_users_with_year": 221,
+        "early_users_without_year": 224,
+        "paired_early_six": 260,
+        "paired_early_two_year": 114,
+        "paired_early_year": 304,
+        "six_padfree_in_early_user_pairs": 39,
+        "six_status_known": 375,
+        "two_year_padfree_in_early_user_pairs": 33,
+        "two_year_status_known": 188,
+        "year_padfree_in_early_user_pairs": 86,
+        "year_status_known": 472
+      },
+      "early_status_counts": {
+        "pad_free": 184,
+        "pad_use": 445
+      },
+      "early_user_subset_year_counts": {
+        "early_users_with_year_status": 221,
+        "year_pad_free": 86,
+        "year_pad_use": 135
+      },
+      "excluded_patients_before_selection": 22,
+      "four_level_burden": {
+        "declared_total": 445,
+        "nonconflicting_quantity_uncertain": 42,
+        "one": 230,
+        "outside_declared_levels": 0,
+        "two_or_more": 168,
+        "unresolved_quantity_evidence": 5
+      },
+      "observation_rule": "exact_window_day_selection",
+      "window_diagnostics": {
+        "early": {
+          "conflicting_day_groups": 10,
+          "conflicting_day_patients": 10,
+          "conflicting_day_rows": 23,
+          "consistent_repeated_day_groups": 115,
+          "mode": "nearest",
+          "patient_day_groups": 805,
+          "patients_lost_after_conflicting_day_omission": 6,
+          "patients_reentering_on_an_alternative_consistent_day": 4,
+          "patients_with_any_known_status_day": 635,
+          "selected_pad_free": 184,
+          "selected_pad_use": 445,
+          "selected_patients": 629,
+          "target_day": 90,
+          "window_days": [
+            60,
+            120
+          ]
+        },
+        "six": {
+          "conflicting_day_groups": 3,
+          "conflicting_day_patients": 3,
+          "conflicting_day_rows": 6,
+          "consistent_repeated_day_groups": 47,
+          "mode": "nearest",
+          "patient_day_groups": 420,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 1,
+          "patients_with_any_known_status_day": 377,
+          "selected_pad_free": 139,
+          "selected_pad_use": 236,
+          "selected_patients": 375,
+          "target_day": 180,
+          "window_days": [
+            150,
+            210
+          ]
+        },
+        "two_year": {
+          "conflicting_day_groups": 1,
+          "conflicting_day_patients": 1,
+          "conflicting_day_rows": 2,
+          "consistent_repeated_day_groups": 23,
+          "mode": "nearest",
+          "patient_day_groups": 237,
+          "patients_lost_after_conflicting_day_omission": 1,
+          "patients_reentering_on_an_alternative_consistent_day": 0,
+          "patients_with_any_known_status_day": 189,
+          "selected_pad_free": 106,
+          "selected_pad_use": 82,
+          "selected_patients": 188,
+          "target_day": 730,
+          "window_days": [
+            670,
+            790
+          ]
+        },
+        "year": {
+          "conflicting_day_groups": 6,
+          "conflicting_day_patients": 6,
+          "conflicting_day_rows": 13,
+          "consistent_repeated_day_groups": 56,
+          "mode": "nearest",
+          "patient_day_groups": 589,
+          "patients_lost_after_conflicting_day_omission": 2,
+          "patients_reentering_on_an_alternative_consistent_day": 4,
+          "patients_with_any_known_status_day": 474,
+          "selected_pad_free": 255,
+          "selected_pad_use": 217,
+          "selected_patients": 472,
+          "target_day": 365,
+          "window_days": [
+            305,
+            425
+          ]
+        }
+      }
+    },
+    "P5": {
+      "all_paired_transitions_including_early_pad_free": {
+        "early_pad_free|later_pad_free": 99,
+        "early_pad_free|later_pad_use": 11,
+        "early_pad_use|later_pad_free": 119,
+        "early_pad_use|later_pad_use": 163,
+        "paired_total": 392
+      },
+      "burden_diagnostics": {
+        "applicable": false,
+        "reason": "milestone_observation_rule_has_no_exact_selected_day"
+      },
+      "comparison_with_p0": {
+        "coupled_patient_changes": {
+          "coupled_early_burden_level_changed": null,
+          "early_status_changed": 4,
+          "not_applicable_reason": "milestone_rule_has_no_exact_day_or_borrowed_burden",
+          "patients_selected_as_early_users_under_both": 427,
+          "patients_selected_in_the_early_window_under_both": 615,
+          "selected_early_day_changed": null,
+          "selected_year_day_changed": null,
+          "year_status_label_changed_including_availability": 36
+        },
+        "early_pad_free": {
+          "entering_under_policy": 74,
+          "exiting_under_policy": 0,
+          "intersection": 184,
+          "policy": 258,
+          "reference_p0": 184
+        },
+        "early_status_known": {
+          "entering_under_policy": 242,
+          "exiting_under_policy": 29,
+          "intersection": 615,
+          "policy": 857,
+          "reference_p0": 644
+        },
+        "early_users": {
+          "entering_under_policy": 172,
+          "exiting_under_policy": 33,
+          "intersection": 427,
+          "policy": 599,
+          "reference_p0": 460
+        },
+        "early_users_with_year": {
+          "entering_under_policy": 92,
+          "exiting_under_policy": 36,
+          "intersection": 190,
+          "policy": 282,
+          "reference_p0": 226
+        },
+        "paired_early_year": {
+          "entering_under_policy": 128,
+          "exiting_under_policy": 45,
+          "intersection": 264,
+          "policy": 392,
+          "reference_p0": 309
+        },
+        "year_padfree_in_early_user_pairs": {
+          "entering_under_policy": 41,
+          "exiting_under_policy": 8,
+          "intersection": 78,
+          "policy": 119,
+          "reference_p0": 86
+        },
+        "year_status_known": {
+          "entering_under_policy": 64,
+          "exiting_under_policy": 56,
+          "intersection": 425,
+          "policy": 489,
+          "reference_p0": 481
+        }
+      },
+      "denominators": {
+        "early_pad_free": 258,
+        "early_status_known": 857,
+        "early_users": 599,
+        "early_users_with_year": 282,
+        "early_users_without_year": 317,
+        "paired_early_year": 392,
+        "year_padfree_in_early_user_pairs": 119,
+        "year_status_known": 489
+      },
+      "early_status_counts": {
+        "pad_free": 258,
+        "pad_use": 599
+      },
+      "early_user_subset_year_counts": {
+        "early_users_with_year_status": 282,
+        "year_pad_free": 119,
+        "year_pad_use": 163
+      },
+      "excluded_patients_before_selection": 0,
+      "milestone_note": "Released milestone observation rule. No exact-window early burden is borrowed and no day is selected.",
+      "observation_rule": "released_milestone_months_3_and_12",
+      "window_diagnostics": {
+        "early": {
+          "explicit_observed_with_explicit_status": 857,
+          "milestone_month": 3,
+          "patients_with_conflicting_milestone_state_unavailable": 0,
+          "patients_with_consistent_repeated_state_collapsed": 0,
+          "patients_with_usable_state": 857,
+          "robotic_milestone_rows": 1397,
+          "selected_pad_free": 258,
+          "selected_pad_use": 599,
+          "selected_patients": 857
+        },
+        "year": {
+          "explicit_observed_with_explicit_status": 489,
+          "milestone_month": 12,
+          "patients_with_conflicting_milestone_state_unavailable": 0,
+          "patients_with_consistent_repeated_state_collapsed": 0,
+          "patients_with_usable_state": 489,
+          "robotic_milestone_rows": 1397,
+          "selected_pad_free": 269,
+          "selected_pad_use": 220,
+          "selected_patients": 489
+        }
+      }
+    }
+  },
+  "privacy": {
+    "aggregate_only": true,
+    "exact_dates_emitted": false,
+    "identifiers_emitted": false,
+    "narratives_emitted": false,
+    "patient_frames_returned_in_memory_only": true,
+    "private_source_filenames_emitted": false,
+    "raw_dictionary_examples_emitted": false,
+    "row_exports": false
+  },
+  "probabilities_or_intervals_emitted": false,
+  "record_kind": "aggregate_source_native_observed_assessment_derivation_only",
+  "science_lock": false,
+  "scope": "Documented assessment selection, four-level documentary burden and named policy rebuilds. No probability, interval, hypothesis test, model fit, weight, imputation or bound on real data.",
+  "software": {
+    "duckdb": "1.5.5",
+    "numpy": "2.5.2",
+    "pandas": "2.3.3",
+    "python": "3.14.3"
+  },
+  "source_root": "data/prostatectomy_analysis_database_v1.1_2026-09-04",
+  "source_row_order_reversal_aggregate_invariance": true,
+  "source_table_sha256": {
+    "continence_events_long": "163c12c74caf8adac5765d05b1e63cb6b0a48723557b4717cea9aa8ce89f5eed",
+    "continence_milestones_long": "ae79ef1b3e2fa59df1d0e6bf54425c1a9a092233907d6957abbe7db8ee7bb366",
+    "patient_wide": "ac2d6de66cd504618c19ff5cc9d05a1c2b639eab1f235e7bbbae92fc19afe125"
+  },
+  "source_verification": {
+    "bound_inputs_after": 122,
+    "bound_inputs_before": 122,
+    "format_parity": {
+      "baseline_pet_nodal_status": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "clinical_domains_safe": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "complications_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "complications_structured_safe": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "continence_events_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "continence_milestones_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "erectile_function_structured_safe": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "erectile_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "governed_psa_endpoint_input": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "imaging_observation": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "patient_wide": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "postoperative_treatment_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "prom_instruments_safe": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "proms_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "psa_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "psa_timepoint_labels_safe": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      },
+      "recurrence_endpoints_long": {
+        "csv_input_different_rows": 0,
+        "parquet_input_different_rows": 0
+      }
+    },
+    "format_parity_tables": 17,
+    "manifest_sha256": "fa6afe47ee2b3e2d2a7fa37d682cd80487346b4200eb74ace131eb759bd3fa1a",
+    "mismatches": 0,
+    "recomputed_day_versus_released_offset": {
+      "comparable_rows": 5376,
+      "offset_missing_or_nonnumeric_rows": 0,
+      "recomputed_day_disagrees_with_released_offset": 0,
+      "rows": 5376
+    },
+    "release_tables": 17,
+    "source_writes_performed": false
+  },
+  "test_sha256": "b3cf714f71f58d57ccf010ab442deba510909733e4a88c012eaa4581d279252d"
+}
