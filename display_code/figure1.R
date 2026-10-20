@@ -56,13 +56,16 @@ g=st$gradient
 stopifnot(g$one$events==as.numeric(d$pooled[[1]]$numerator),g$one$n==as.numeric(d$pooled[[1]]$denominator),
  g$two$events+g$three_or_more$events+g$two_or_more_unseparated$events==as.numeric(d$pooled[[2]]$numerator),
  g$two$n+g$three_or_more$n+g$two_or_more_unseparated$n==as.numeric(d$pooled[[2]]$denominator))
+# Rows follow the comparison: one pad, then all two-or-more users with their exactly-two and
+# three-or-more subgroups indented beneath them.
 Brows=list(grow(g$pad_free_at_three_months$events,g$pad_free_at_three_months$n,'No pads (pad-free at three months)','pad_free'),
- d$pooled[[1]],grow(g$two$events,g$two$n,'Exactly two pads','two_or_more'),
- grow(g$three_or_more$events,g$three_or_more$n,'Three or more pads','two_or_more'),d$pooled[[2]],d$pooled[[5]])
-Brows[[2]]$label='One pad';Brows[[5]]$label='Two or more pads, all';Brows[[6]]$label='All men using pads'
+ d$pooled[[1]],d$pooled[[2]],grow(g$two$events,g$two$n,'Exactly two pads','two_or_more'),
+ grow(g$three_or_more$events,g$three_or_more$n,'Three or more pads','two_or_more'),d$pooled[[5]])
+Brows[[2]]$label='One pad';Brows[[3]]$label='Two or more pads, all';Brows[[6]]$label='All men using pads'
+Brows[[4]]$indent=TRUE;Brows[[5]]$indent=TRUE
 pB=forest_block(Brows,'B  Pad freedom at one year by daily pad count at three months',c(7.0,6.0,5.0,4.0,3.0,1.5),header=Bheader,rule_at=2.25,axis_title='Documented pad freedom at one year (%)')
 d$country=lapply(d$country,function(r){r$label=sub('^One ordinary pad documented','One pad',r$label);r$label=sub('^Two or more ordinary pads documented','Two or more pads',r$label);r})
 pC=forest_country(d$country,'C  Documented pad freedom at one year within each country',header=Bheader,axis_title='Documented pad freedom at one year (%)')
-pD=forest(d$contrasts,'D  Difference within each population, one pad minus two or more pads',c(3.4,2.4,1.4),contrast=TRUE,header=paste0('Difference (',d$meta$confidence,'% CI)'),axis_title='Difference (percentage points)',rule_at=2.9)
+pD=forest(d$contrasts,'D  Difference within each population, one pad minus two or more pads',c(3.4,2.4,1.4),contrast=TRUE,header=paste0('Percentage points (',d$meta$confidence,'% CI)'),axis_title='Difference (percentage points)',rule_at=2.9)
 fig=wrap_plots(list(pA,pB,pC,pD),ncol=1,heights=c(56,72,70,48),guides='collect',axis_titles='collect')
 export_figure(fig,list(pA,pB,pC,pD),'Figure1',232)

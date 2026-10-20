@@ -102,7 +102,7 @@ pA=pA+annotate('segment',x=gridticks,xend=gridticks,y=min(ys)-.45,yend=max(ys)+.
 pA=pA+annotate('segment',x=0,xend=0,y=.5,yend=max(ys)+.35,linewidth=.3,linetype='dashed',colour='#8c8c8c')
 for(ry in rules)pA=pA+annotate('ribbon',x=c(-109,215),ymin=ry-0.02,ymax=ry+0.02,fill='#8c8c8c',colour=NA)
 for(h in heads)pA=pA+text_at(-109,h$y,h$label,face='bold',col='#555555')
-pA=pA+text_at(108,top,'One vs two or more   Difference (95% CI)',face='bold')
+pA=pA+text_at(108,top,'One vs two or more   Percentage points (95% CI)',face='bold')
 for(r in items){
  pA=pA+text_at(-109,r$y,wrap(r$label))+
   annotate('segment',x=r$lower,xend=r$upper,y=r$y,yend=r$y,linewidth=ci_lwd,colour='#000000')+

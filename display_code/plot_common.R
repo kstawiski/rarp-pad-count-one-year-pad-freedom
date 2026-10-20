@@ -67,7 +67,8 @@ forest_block <- function(rows,title,ys,header=NULL,subhead_at=NULL,rule_at=NULL,
   shape=if(kind=='one')16 else if(kind=='two_or_more')17 else if(kind=='overall')18 else 15
   show=TRUE;if(!is.null(r$show_interval))show=isTRUE(r$show_interval)
   show_point=isTRUE(r$show_point %||% TRUE)
-  p=p+text_at(-109,y,wrap(r$label))
+  # Subgroup rows are indented under their parent row.
+  p=p+text_at(if(isTRUE(r$indent))-104 else -109,y,wrap(r$label))
   if(show)p=p+annotate('segment',x=as.numeric(r$lower),xend=as.numeric(r$upper),y=y,yend=y,linewidth=ci_lwd,colour=co)
   if(show_point)p=p+annotate('point',x=as.numeric(r$estimate),y=y,size=pt_size,shape=shape,colour=co)
   p=p+text_at(108,y,r$text)

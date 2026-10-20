@@ -2,8 +2,9 @@
 
 Run after promotion (manuscript/manuscript.md, supplement/supplementary-material.md,
 submission/reporting-checklist.md, display files in the displays v6 workspace).
-Writes submission/package/ (numbered files, review PDFs, README, manifest) and
-submission/upload/ (portal files only). Existing directories must already be backed up.
+Writes submission/package/ (numbered deliverables only), submission/upload/ (the same portal
+files without prefixes), submission/review_copies/ (PDF review copies), and the README and
+manifest beside the package. Existing output directories must already be backed up.
 """
 import csv
 import hashlib
@@ -20,6 +21,9 @@ M1 = Path('/umed-projekty/PROSTATA_JOBCZYK2026_v2/manuscript1')
 DISP = Path('/umed-projekty/PROSTATA_JOBCZYK2026_v2/delegated_tasks/manuscript1_displays_v6')
 PKG = M1 / 'submission/package'
 UPLOAD = M1 / 'submission/upload'
+REVIEW = M1 / 'submission/review_copies'
+GITHUB = 'https://github.com/kstawiski/rarp-pad-count-one-year-pad-freedom'
+GITHUB_TAG = 'v1.1.0'
 WORK = M1 / 'submission/build'
 REF = M1 / 'submission/reference-style.docx'
 PANDOC = '/home/konrad/.local/bin/pandoc'
@@ -32,8 +36,21 @@ FILES = [
     ('05_Figure1.tiff', 'Figure1.tiff', 'Figure 1, 190 mm wide, 1000 dpi, LZW'),
     ('06_Figure2.tiff', 'Figure2.tiff', 'Figure 2, 190 mm wide, 1000 dpi, LZW'),
     ('07_Reporting_checklist_STROBE_RECORD.docx', 'Reporting_checklist_STROBE_RECORD.docx', 'STROBE and RECORD checklist with locations'),
-    ('10_Code_and_aggregate_outputs.zip', 'Code_and_aggregate_outputs.zip', 'Analysis code and aggregate outputs for editors and reviewers (no patient-level data)'),
+    ('08_Code_and_aggregate_outputs.zip', 'Code_and_aggregate_outputs.zip', 'Analysis code and aggregate outputs for editors and reviewers (no patient-level data)'),
+    ('09_EUROS_authorship_form.docx', 'EUROS_authorship_form.docx', 'EU Open Science Authorship Responsibility, Financial Disclosure and Acknowledgment form (corresponding author)'),
+    ('10_ICMJE_disclosure_1_Jobczyk.docx', 'ICMJE_disclosure_1_Jobczyk.docx', 'ICMJE disclosure form, M. Jobczyk'),
+    ('10_ICMJE_disclosure_2_Clinton.docx', 'ICMJE_disclosure_2_Clinton.docx', 'ICMJE disclosure form, T.N. Clinton'),
+    ('10_ICMJE_disclosure_3_Carvalho.docx', 'ICMJE_disclosure_3_Carvalho.docx', 'ICMJE disclosure form, F.L. De Carvalho'),
+    ('10_ICMJE_disclosure_4_Ciechanowski.docx', 'ICMJE_disclosure_4_Ciechanowski.docx', 'ICMJE disclosure form, P. Ciechanowski'),
+    ('10_ICMJE_disclosure_5_Piaszczynska.docx', 'ICMJE_disclosure_5_Piaszczynska.docx', 'ICMJE disclosure form, M. Piaszczyńska'),
+    ('10_ICMJE_disclosure_6_Mouw.docx', 'ICMJE_disclosure_6_Mouw.docx', 'ICMJE disclosure form, K.W. Mouw'),
+    ('10_ICMJE_disclosure_7_Fendler.docx', 'ICMJE_disclosure_7_Fendler.docx', 'ICMJE disclosure form, W. Fendler'),
+    ('10_ICMJE_disclosure_8_Stawiski.docx', 'ICMJE_disclosure_8_Stawiski.docx', 'ICMJE disclosure form, K. Stawiski'),
+    ('11_Cover_letter.docx', 'Cover_letter.docx', 'Cover letter (optional for the journal; may also be pasted into the submission comments)'),
 ]
+# Form files in submission/forms keep their earlier numbering (11_ authorship form, 12_ ICMJE forms).
+FORM_SOURCES = {name: ('11_' if name.startswith('09_') else '12_') + name.split('_', 1)[1]
+                for name, _, _ in FILES if name.startswith(('09_', '10_'))}
 
 
 def run(cmd, **kw):
@@ -123,7 +140,7 @@ def placeholders(paths):
     found = []
     for p in paths:
         text = p.read_text()
-        for m in re.finditer(r'\[PLACEHOLDER:[^\]]*\]', text):
+        for m in re.finditer(r'\[(?:PLACEHOLDER|AUTHORS?|TODO)\b[^\]]*\]', text):
             line = text.count('\n', 0, m.start()) + 1
             found.append((p.relative_to(M1), line, m.group(0)))
     return found
@@ -134,10 +151,10 @@ def sha256(path):
 
 
 def main():
-    for d in (PKG, UPLOAD):
+    for d in (PKG, UPLOAD, REVIEW):
         if d.exists() and any(d.iterdir()):
             sys.exit(f'{d} is not empty; back it up first')
-    for d in (PKG, UPLOAD, WORK):
+    for d in (PKG, UPLOAD, REVIEW, WORK):
         d.mkdir(parents=True, exist_ok=True)
     if not (WORK / 'manuscript1_code_and_aggregate_outputs.zip').exists():
         sys.exit('code archive missing; build submission/build/manuscript1_code_and_aggregate_outputs.zip first')
@@ -151,20 +168,25 @@ def main():
     pandoc(checklist, PKG / '07_Reporting_checklist_STROBE_RECORD.docx', land)
     shutil.copy2(DISP / 'tables/Table1.docx', PKG / '03_Table1.docx')
     shutil.copy2(DISP / 'tables/Table2.docx', PKG / '04_Table2.docx')
+    FORMS = M1 / 'submission/forms'
+    for name, _, _ in FILES:
+        if name.startswith(('09_', '10_')):
+            shutil.copy2(FORMS / FORM_SOURCES[name], PKG / name)
+    pandoc(M1 / 'submission/cover-letter.md', PKG / '11_Cover_letter.docx', portrait)
     shutil.copy2(DISP / 'figures/Figure1.tiff', PKG / '05_Figure1.tiff')
     shutil.copy2(DISP / 'figures/Figure2.tiff', PKG / '06_Figure2.tiff')
-    shutil.copy2(WORK / 'manuscript1_code_and_aggregate_outputs.zip', PKG / '10_Code_and_aggregate_outputs.zip')
+    shutil.copy2(WORK / 'manuscript1_code_and_aggregate_outputs.zip', PKG / '08_Code_and_aggregate_outputs.zip')
     for name in ('01_Main_manuscript.docx', '02_Supplementary_material.docx', '03_Table1.docx', '04_Table2.docx',
                  '07_Reporting_checklist_STROBE_RECORD.docx'):
         scrub_metadata(PKG / name)
     add_line_and_page_numbers(PKG / '01_Main_manuscript.docx')
     protect_table_rows(PKG / '02_Supplementary_material.docx')
     for name in ('01_Main_manuscript.docx', '02_Supplementary_material.docx'):
-        to_pdf(PKG / name, PKG)
+        to_pdf(PKG / name, REVIEW)
     for pkg_name, up_name, _ in FILES:
         shutil.copy2(PKG / pkg_name, UPLOAD / up_name)
 
-    marks = placeholders([ms, supp])
+    marks = placeholders([ms, supp, checklist, M1 / 'submission/cover-letter.md'])
     readme = [
         'MANUSCRIPT 1 SUBMISSION PACKAGE',
         'Daily pad count three months after robot-assisted radical prostatectomy predicts pad freedom at one year: a two-country cohort study',
@@ -175,12 +197,10 @@ def main():
     for pkg_name, _, role in FILES:
         readme.append(f'  {pkg_name:48s} {role}')
     readme += [
-        '  01_Main_manuscript.pdf                           Review copy generated from the DOCX (the DOCX is authoritative)',
-        '  02_Supplementary_material.pdf                    Review copy generated from the DOCX',
-        '  08_Revision_notes.md                             Point-by-point record of the final review (not for upload)',
-        '  09_MANIFEST.csv                                  SHA-256 of every file in this folder',
         '',
-        'The same portal files, without numeric prefixes, are in submission/upload/ in the workspace.',
+        'The same portal files, without numeric prefixes, are in submission/upload/.',
+        'PDF review copies generated from the DOCX files are in submission/review_copies/; the DOCX files are authoritative.',
+        'package_MANIFEST.csv, beside this README, gives the SHA-256 of every file in the package.',
         '',
         f'PLACEHOLDERS TO COMPLETE BEFORE SUBMISSION ({len(marks)})',
     ]
@@ -189,19 +209,16 @@ def main():
     readme += [
         '',
         'HUMAN STEPS BEFORE UPLOAD',
-        '  1. Every author approves the final text and the placeholder entries.',
-        '  2. Deposit 10_Code_and_aggregate_outputs.zip in a public repository (for example Zenodo) and insert the DOI.',
-        '  3. Complete the EU Open Science authorship form and ICMJE disclosure forms.',
-        '  4. Write and sign the cover letter.',
-        '  5. Rebuild the DOCX files after filling placeholders and recheck word counts',
-        '     (abstract at most 250 words, text at most 2500 words).',
+        '  1. Every author approves the final text, including Maja Piaszczynska, who joined the author list on 20 October 2026.',
+        f'  2. The code archive is deposited at {GITHUB} (tag {GITHUB_TAG}); re-tag it if the archive changes.',
+        '  3. Check the EU Open Science authorship form (09) and the ICMJE disclosure forms (10); each author confirms their own ICMJE form.',
+        '  4. Check and sign the cover letter (11), and confirm on the day of submission the status of the related manuscripts it lists.',
+        '  5. Rebuild the DOCX files after any text change and recheck word counts',
+        '     (abstract at most 250 words, text at most 2500 words, Take Home Message at most 40 words).',
     ]
-    (PKG / '00_README.txt').write_text('\n'.join(readme) + '\n')
-    notes = M1 / 'review/final-review-revision-notes.md'
-    if notes.exists():
-        shutil.copy2(notes, PKG / '08_Revision_notes.md')
-    rows = [(p.name, p.stat().st_size, sha256(p)) for p in sorted(PKG.iterdir()) if p.name != '09_MANIFEST.csv']
-    with (PKG / '09_MANIFEST.csv').open('w', newline='') as fh:
+    (M1 / 'submission/package_README.txt').write_text('\n'.join(readme) + '\n')
+    rows = [(p.name, p.stat().st_size, sha256(p)) for p in sorted(PKG.iterdir())]
+    with (M1 / 'submission/package_MANIFEST.csv').open('w', newline='') as fh:
         w = csv.writer(fh)
         w.writerow(['file', 'bytes', 'sha256'])
         w.writerows(rows)
@@ -209,7 +226,7 @@ def main():
         w = csv.writer(fh)
         w.writerow(['file', 'bytes', 'sha256'])
         w.writerows((p.name, p.stat().st_size, sha256(p)) for p in sorted(UPLOAD.iterdir()))
-    print(f'package built with {len(rows) + 1} files; {len(marks)} placeholders')
+    print(f'package built with {len(rows)} files; {len(marks)} placeholders')
 
 
 if __name__ == '__main__':
