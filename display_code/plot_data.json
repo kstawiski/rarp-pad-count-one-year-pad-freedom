@@ -1,92 +1,292 @@
 {
+  "meta": {
+    "confidence": "95",
+    "draws": "2000",
+    "extract_year": "2026",
+    "extract_day": "1",
+    "close_day": "425",
+    "recent_start_yr": "2024",
+    "yr_2014": "2014",
+    "yr_2017": "2017",
+    "yr_2019": "2019",
+    "yr_2020": "2020",
+    "yr_2021": "2021",
+    "yr_2022": "2022",
+    "yr_2023": "2023",
+    "yr_2024": "2024",
+    "yr_2025": "2025",
+    "age_lt60": "60",
+    "age_60": "60",
+    "age_69": "69",
+    "age_ge70": "70",
+    "zero_day": "0",
+    "milestone_3": "3",
+    "milestone_12": "12",
+    "epic_lo": "0",
+    "epic_hi": "12",
+    "comp_30": "30",
+    "comp_90": "90",
+    "stage_max": "4",
+    "asa_2": "2",
+    "asa_3": "3",
+    "asa_4": "4",
+    "age_years": "10",
+    "age_center": "65",
+    "day_step": "30",
+    "bmi_step": "5",
+    "bmi_center": "28",
+    "vol_step": "10",
+    "vol_center": "40",
+    "surg_dbl": "2",
+    "surg_center": "32",
+    "cal_slope_ideal": "1",
+    "one_pt": "1",
+    "unit_step": "1",
+    "pct_100": "100",
+    "tbl_1": "1",
+    "tbl_2": "2",
+    "isup_1": "1",
+    "isup_2": "2",
+    "isup_3": "3",
+    "isup_4": "4",
+    "isup_5": "5",
+    "early_0": "60",
+    "early_1": "120",
+    "early_target": "90",
+    "year_0": "305",
+    "year_1": "425",
+    "year_target": "365",
+    "six_0": "150",
+    "six_1": "210",
+    "six_target": "180",
+    "two_year_0": "670",
+    "two_year_1": "790",
+    "two_year_target": "730",
+    "narrow_early_0": "75",
+    "narrow_early_1": "105",
+    "narrow_year_0": "335",
+    "narrow_year_1": "395",
+    "extended_0": "305",
+    "extended_1": "545"
+  },
   "ladder": [
     {
-      "label": "Patients in the data release",
-      "count": "1497"
+      "label": "Patients in the database",
+      "count": "1497",
+      "side_label": "Non-robotic procedures",
+      "side_count": "100"
     },
     {
       "label": "Robot-assisted radical prostatectomy",
-      "count": "1397"
+      "count": "1397",
+      "side_label": "One-year window not ended before data extraction",
+      "side_count": "375"
+    },
+    {
+      "label": "Men with a completed one-year window",
+      "count": "1022",
+      "side_label": "No three-month assessment",
+      "side_count": "522"
     },
     {
       "label": "Pad status recorded at about three months",
-      "count": "644"
+      "count": "500",
+      "side_label": "Pad-free at three months",
+      "side_count": "136"
     },
     {
       "label": "Using pads at about three months",
-      "count": "460"
+      "count": "364",
+      "side_label": "No one-year record",
+      "side_count": "151"
     },
     {
       "label": "Pad status recorded at about one year",
-      "count": "226"
+      "count": "213",
+      "side_label": "Unclear or conflicting count",
+      "side_count": "24"
+    },
+    {
+      "label": "One pad vs two or more",
+      "count": "189",
+      "side_label": null,
+      "side_count": null,
+      "shaded": true
     }
   ],
-  "without": "234",
-  "pooled": [
+  "without": "151",
+  "panel_b": [
     {
-      "label": "One ordinary pad documented",
-      "kind": "one",
-      "show_interval": true,
-      "show_point": true,
-      "numerator": "58",
-      "denominator": "110",
-      "estimate": "53",
-      "block": "ordered",
-      "lower": "43",
-      "upper": "62",
-      "text": "58/110   53% (43–62)"
+      "key": "pad_free_at_three_months",
+      "label": "No pads",
+      "right_text": "72/80   90% (81–95)",
+      "segments": [
+        {
+          "category": "pad_free",
+          "label": "Pad-free",
+          "xmin": 0.0,
+          "xmax": 90.0,
+          "pct": 90.0,
+          "show_label": true,
+          "inside_label": "90%"
+        },
+        {
+          "category": "one",
+          "label": "Using pads, at most one per day",
+          "xmin": 90.0,
+          "xmax": 95.0,
+          "pct": 5.0,
+          "show_label": false,
+          "inside_label": ""
+        },
+        {
+          "category": "two_or_more",
+          "label": "More than one pad per day",
+          "xmin": 95.0,
+          "xmax": 96.25,
+          "pct": 1.25,
+          "show_label": false,
+          "inside_label": ""
+        },
+        {
+          "category": "not_classifiable",
+          "label": "Pads, count not recorded",
+          "xmin": 96.25,
+          "xmax": 100.0,
+          "pct": 3.75,
+          "show_label": false,
+          "inside_label": ""
+        }
+      ]
     },
     {
-      "label": "Two or more ordinary pads documented",
-      "kind": "two_or_more",
-      "show_interval": true,
-      "show_point": true,
-      "numerator": "24",
-      "denominator": "91",
-      "estimate": "26",
-      "block": "ordered",
-      "lower": "18",
-      "upper": "36",
-      "text": "24/91   26% (18–36)"
+      "key": "one",
+      "label": "One pad",
+      "right_text": "54/104   52% (42–61)",
+      "segments": [
+        {
+          "category": "pad_free",
+          "label": "Pad-free",
+          "xmin": 0.0,
+          "xmax": 51.92307692307693,
+          "pct": 51.92307692307693,
+          "show_label": true,
+          "inside_label": "52%"
+        },
+        {
+          "category": "one",
+          "label": "Using pads, at most one per day",
+          "xmin": 51.92307692307693,
+          "xmax": 95.19230769230771,
+          "pct": 43.269230769230774,
+          "show_label": true,
+          "inside_label": "43%"
+        },
+        {
+          "category": "two_or_more",
+          "label": "More than one pad per day",
+          "xmin": 95.19230769230771,
+          "xmax": 98.0769230769231,
+          "pct": 2.8846153846153846,
+          "show_label": false,
+          "inside_label": ""
+        },
+        {
+          "category": "not_classifiable",
+          "label": "Pads, count not recorded",
+          "xmin": 98.0769230769231,
+          "xmax": 100.00000000000001,
+          "pct": 1.9230769230769231,
+          "show_label": false,
+          "inside_label": ""
+        }
+      ]
     },
     {
-      "label": "Pad quantity unclear, no conflicting evidence",
-      "kind": "nonconflicting_quantity_uncertain",
-      "show_interval": true,
-      "show_point": true,
-      "numerator": "4",
-      "denominator": "23",
-      "estimate": "17",
-      "block": "documentation_state",
-      "lower": "7.0",
-      "upper": "37",
-      "text": "4/23   17% (7.0–37)"
+      "key": "two",
+      "label": "Two pads",
+      "right_text": "15/36   42% (27–58)",
+      "segments": [
+        {
+          "category": "pad_free",
+          "label": "Pad-free",
+          "xmin": 0.0,
+          "xmax": 41.66666666666667,
+          "pct": 41.66666666666667,
+          "show_label": true,
+          "inside_label": "42%"
+        },
+        {
+          "category": "one",
+          "label": "Using pads, at most one per day",
+          "xmin": 41.66666666666667,
+          "xmax": 88.88888888888889,
+          "pct": 47.22222222222222,
+          "show_label": true,
+          "inside_label": "47%"
+        },
+        {
+          "category": "two_or_more",
+          "label": "More than one pad per day",
+          "xmin": 88.88888888888889,
+          "xmax": 100.0,
+          "pct": 11.11111111111111,
+          "show_label": true,
+          "inside_label": "11%"
+        },
+        {
+          "category": "not_classifiable",
+          "label": "Pads, count not recorded",
+          "xmin": 100.0,
+          "xmax": 100.0,
+          "pct": 0.0,
+          "show_label": false,
+          "inside_label": ""
+        }
+      ]
     },
     {
-      "label": "Pad quantity conflicting or invalid",
-      "kind": "unresolved_quantity_evidence",
-      "show_interval": true,
-      "show_point": false,
-      "numerator": "0",
-      "denominator": "2",
-      "estimate": "0",
-      "block": "documentation_state",
-      "lower": "0",
-      "upper": "66",
-      "text": "0/2   0% (0–66)"
-    },
-    {
-      "label": "Overall, both countries combined",
-      "kind": "overall",
-      "show_interval": true,
-      "show_point": true,
-      "numerator": "86",
-      "denominator": "226",
-      "estimate": "38",
-      "block": "overall",
-      "lower": "32",
-      "upper": "45",
-      "text": "86/226   38% (32–45)"
+      "key": "three_or_more",
+      "label": "Three or more pads",
+      "right_text": "8/38   21% (11–36)",
+      "segments": [
+        {
+          "category": "pad_free",
+          "label": "Pad-free",
+          "xmin": 0.0,
+          "xmax": 21.052631578947366,
+          "pct": 21.052631578947366,
+          "show_label": true,
+          "inside_label": "21%"
+        },
+        {
+          "category": "one",
+          "label": "Using pads, at most one per day",
+          "xmin": 21.052631578947366,
+          "xmax": 63.157894736842096,
+          "pct": 42.10526315789473,
+          "show_label": true,
+          "inside_label": "42%"
+        },
+        {
+          "category": "two_or_more",
+          "label": "More than one pad per day",
+          "xmin": 63.157894736842096,
+          "xmax": 97.36842105263156,
+          "pct": 34.21052631578947,
+          "show_label": true,
+          "inside_label": "34%"
+        },
+        {
+          "category": "not_classifiable",
+          "label": "Pads, count not recorded",
+          "xmin": 97.36842105263156,
+          "xmax": 99.99999999999999,
+          "pct": 2.631578947368421,
+          "show_label": false,
+          "inside_label": ""
+        }
+      ]
     }
   ],
   "country": [
@@ -95,522 +295,271 @@
       "kind": "overall",
       "show_interval": true,
       "show_point": true,
-      "numerator": "21",
-      "denominator": "89",
-      "estimate": "24",
-      "lower": "16",
-      "upper": "33",
-      "text": "21/89   24% (16–33)"
+      "numerator": "20",
+      "denominator": "83",
+      "estimate": 24.096385542168676,
+      "lower": 16.174743841159025,
+      "upper": 34.30973605595528,
+      "text": "20/83   24% (16–34)"
     },
     {
-      "label": "One ordinary pad documented in Poland",
+      "label": "One pad per day in Poland",
       "kind": "one",
       "show_interval": true,
       "show_point": true,
-      "numerator": "17",
-      "denominator": "41",
-      "estimate": "41",
-      "lower": "28",
-      "upper": "57",
-      "text": "17/41   41% (28–57)"
+      "numerator": "16",
+      "denominator": "39",
+      "estimate": 41.02564102564102,
+      "lower": 27.079310000725172,
+      "upper": 56.581377117103024,
+      "text": "16/39   41% (27–57)"
     },
     {
-      "label": "Two or more ordinary pads documented in Poland",
+      "label": "Two or more pads per day in Poland",
       "kind": "two_or_more",
       "show_interval": true,
       "show_point": true,
       "numerator": "4",
-      "denominator": "40",
-      "estimate": "10",
-      "lower": "4.0",
-      "upper": "23",
-      "text": "4/40   10% (4.0–23)"
+      "denominator": "37",
+      "estimate": 10.81081081081081,
+      "lower": 4.285189940411473,
+      "upper": 24.70853154412602,
+      "text": "4/37   11% (4.3–25)"
     },
     {
       "label": "United States overall",
       "kind": "overall",
       "show_interval": true,
       "show_point": true,
-      "numerator": "65",
-      "denominator": "137",
-      "estimate": "47",
-      "lower": "39",
-      "upper": "56",
-      "text": "65/137   47% (39–56)"
+      "numerator": "62",
+      "denominator": "130",
+      "estimate": 47.69230769230769,
+      "lower": 39.29654221630551,
+      "upper": 56.22054191228417,
+      "text": "62/130   48% (39–56)"
     },
     {
-      "label": "One ordinary pad documented in United States",
+      "label": "One pad per day in United States",
       "kind": "one",
       "show_interval": true,
       "show_point": true,
-      "numerator": "41",
-      "denominator": "69",
-      "estimate": "59",
-      "lower": "48",
-      "upper": "70",
-      "text": "41/69   59% (48–70)"
+      "numerator": "38",
+      "denominator": "65",
+      "estimate": 58.46153846153847,
+      "lower": 46.33898487349736,
+      "upper": 69.63975844257737,
+      "text": "38/65   58% (46–70)"
     },
     {
-      "label": "Two or more ordinary pads documented in United States",
+      "label": "Two or more pads per day in United States",
       "kind": "two_or_more",
       "show_interval": true,
       "show_point": true,
       "numerator": "20",
-      "denominator": "51",
-      "estimate": "39",
-      "lower": "27",
-      "upper": "53",
-      "text": "20/51   39% (27–53)"
+      "denominator": "48",
+      "estimate": 41.66666666666667,
+      "lower": 28.849667778411565,
+      "upper": 55.71866771602372,
+      "text": "20/48   42% (29–56)"
     }
   ],
   "contrasts": [
     {
       "label": "Both countries combined",
       "show_interval": true,
-      "estimate": "26",
-      "lower": "13",
-      "upper": "40",
-      "text": "26 (13–40)"
+      "estimate": 23.68778280542987,
+      "lower": 10.076428941141675,
+      "upper": 37.340297383775635,
+      "text": "24 (10–37)"
     },
     {
       "label": "Poland",
       "show_interval": true,
-      "estimate": "31",
-      "lower": "13",
-      "upper": "49",
-      "text": "31 (13–49)"
+      "estimate": 30.21483021483021,
+      "lower": 12.498094512195122,
+      "upper": 48.84821428571428,
+      "text": "30 (12–49)"
     },
     {
       "label": "United States",
       "show_interval": true,
-      "estimate": "20",
-      "lower": "2.4",
-      "upper": "38",
-      "text": "20 (2.4–38)"
+      "estimate": 16.794871794871796,
+      "lower": -2.4607649753199667,
+      "upper": 35.72204940353325,
+      "text": "17 (−2.5 to 36)"
     }
   ],
-  "rules": [
+  "include_era_2017_2024": true,
+  "figure2_sections": [
     {
-      "label": "Reference nearest assessment",
-      "retained": "226",
-      "entered": "0",
-      "exited": "0",
-      "overall": {
-        "label": "Reference nearest assessment",
-        "kind": "overall",
-        "show_interval": true,
-        "show_point": true,
-        "numerator": "86",
-        "denominator": "226",
-        "estimate": "38",
-        "lower": "32",
-        "upper": "45",
-        "text": "86/226   38% (32–45)"
-      },
-      "contrast": {
-        "label": "Reference nearest assessment",
-        "show_interval": true,
-        "estimate": "26",
-        "lower": "13",
-        "upper": "40",
-        "text": "26 (13–40)"
-      },
-      "groups": "58/110 vs 24/91"
+      "head": "Assessment selection",
+      "rows": [
+        {
+          "label": "Main analysis",
+          "estimate": 23.68778280542987,
+          "lower": 10.076428941141675,
+          "upper": 37.340297383775635,
+          "text": "54/104 vs 24/85   24 (10–37)"
+        },
+        {
+          "label": "Conflicting windows excluded",
+          "estimate": 22.764705882352942,
+          "lower": 9.116007107873713,
+          "upper": 36.907628262826265,
+          "text": "51/100 vs 24/85   23 (9.1–37)"
+        },
+        {
+          "label": "First usable assessment",
+          "estimate": 25.1980805713648,
+          "lower": 12.215065371758275,
+          "upper": 38.412157040664965,
+          "text": "52/103 vs 22/87   25 (12–38)"
+        },
+        {
+          "label": "Narrower assessment windows",
+          "estimate": 26.78169542385596,
+          "lower": 5.513677414539483,
+          "upper": 48.74703731022189,
+          "text": "24/43 vs 9/31   27 (5.5–49)"
+        },
+        {
+          "label": "Uncertain assessment dates excluded",
+          "estimate": 24.02551381998583,
+          "lower": 10.2716671665376,
+          "upper": 37.924591919931615,
+          "text": "54/102 vs 24/83   24 (10–38)"
+        }
+      ]
     },
     {
-      "label": "Exclude windows with any conflicting pad status",
-      "retained": "221",
-      "entered": "0",
-      "exited": "5",
-      "overall": {
-        "label": "Exclude windows with any conflicting pad status",
-        "kind": "overall",
-        "show_interval": true,
-        "show_point": true,
-        "numerator": "82",
-        "denominator": "221",
-        "estimate": "37",
-        "lower": "31",
-        "upper": "44",
-        "text": "82/221   37% (31–44)"
-      },
-      "contrast": {
-        "label": "Exclude windows with any conflicting pad status",
-        "show_interval": true,
-        "estimate": "25",
-        "lower": "12",
-        "upper": "39",
-        "text": "25 (12–39)"
-      },
-      "groups": "54/105 vs 24/91"
+      "head": "Pad-count measurement",
+      "rows": [
+        {
+          "label": "Exact counts only",
+          "estimate": 18.052109181141446,
+          "lower": 2.1415122123615835,
+          "upper": 33.276784536744344,
+          "text": "54/104 vs 21/62   18 (2.1–33)"
+        },
+        {
+          "label": "EPIC questionnaire counts excluded",
+          "estimate": 26.27525252525253,
+          "lower": 12.298958314614545,
+          "upper": 40.74336509062162,
+          "text": "52/99 vs 21/80   26 (12–41)"
+        },
+        {
+          "label": "Unclassifiable counts as one pad",
+          "estimate": 17.077205882352942,
+          "lower": 4.387701875881887,
+          "upper": 30.203875524511965,
+          "text": "58/128 vs 24/85   17 (4.4–30)"
+        },
+        {
+          "label": "Unclassifiable counts as two or more",
+          "estimate": 26.23500352858151,
+          "lower": 13.955004303688511,
+          "upper": 38.56793252314351,
+          "text": "54/104 vs 28/109   26 (14–39)"
+        },
+        {
+          "label": "Unclassifiable counts, least favourable split",
+          "estimate": 12.087712939470824,
+          "lower": -1.1617633907356317,
+          "upper": 24.462566832021288,
+          "text": "54/124 vs 28/89   12 (−1.2 to 24)"
+        }
+      ]
     },
     {
-      "label": "First usable assessment",
-      "retained": "226",
-      "entered": "0",
-      "exited": "0",
-      "overall": {
-        "label": "First usable assessment",
-        "kind": "overall",
-        "show_interval": true,
-        "show_point": true,
-        "numerator": "82",
-        "denominator": "226",
-        "estimate": "36",
-        "lower": "30",
-        "upper": "43",
-        "text": "82/226   36% (30–43)"
-      },
-      "contrast": {
-        "label": "First usable assessment",
-        "show_interval": true,
-        "estimate": "27",
-        "lower": "14",
-        "upper": "40",
-        "text": "27 (14–40)"
-      },
-      "groups": "55/108 vs 22/93"
+      "head": "Follow-up and missing records",
+      "rows": [
+        {
+          "label": "Later operations included",
+          "estimate": 26.353646353646347,
+          "lower": 13.272646346674263,
+          "upper": 39.512089322261176,
+          "text": "58/110 vs 24/91   26 (13–40)"
+        },
+        {
+          "label": "Operated 2017–2024",
+          "estimate": 23.389355742296924,
+          "lower": 9.384814148825898,
+          "upper": 37.148878490790246,
+          "text": "53/102 vs 22/77   23 (9.4–37)"
+        },
+        {
+          "label": "One-year window extended to day 545",
+          "estimate": 23.458330084976996,
+          "lower": 10.97209467326965,
+          "upper": 36.20126622564732,
+          "text": "65/127 vs 28/101   23 (11–36)"
+        },
+        {
+          "label": "Weighted for record availability",
+          "estimate": 23.11253337128142,
+          "lower": 10.2682841800193,
+          "upper": 36.84184650158897,
+          "text": "50% vs 27%   23 (10–37)"
+        }
+      ]
     },
     {
-      "label": "Narrower assessment windows",
-      "retained": "89",
-      "entered": "0",
-      "exited": "137",
-      "overall": {
-        "label": "Narrower assessment windows",
-        "kind": "overall",
-        "show_interval": true,
-        "show_point": true,
-        "numerator": "35",
-        "denominator": "89",
-        "estimate": "39",
-        "lower": "30",
-        "upper": "50",
-        "text": "35/89   39% (30–50)"
-      },
-      "contrast": {
-        "label": "Narrower assessment windows",
-        "show_interval": true,
-        "estimate": "30",
-        "lower": "7.9",
-        "upper": "51",
-        "text": "30 (7.9–51)"
-      },
-      "groups": "25/44 vs 9/34"
-    },
-    {
-      "label": "Exclude potential date-selection impact",
-      "retained": "221",
-      "entered": "0",
-      "exited": "5",
-      "overall": {
-        "label": "Exclude potential date-selection impact",
-        "kind": "overall",
-        "show_interval": true,
-        "show_point": true,
-        "numerator": "86",
-        "denominator": "221",
-        "estimate": "39",
-        "lower": "33",
-        "upper": "45",
-        "text": "86/221   39% (33–45)"
-      },
-      "contrast": {
-        "label": "Exclude potential date-selection impact",
-        "show_interval": true,
-        "estimate": "27",
-        "lower": "14",
-        "upper": "40",
-        "text": "27 (14–40)"
-      },
-      "groups": "58/108 vs 24/89"
-    },
-    {
-      "label": "Recorded three- and twelve-month milestones",
-      "retained": "190",
-      "entered": "92",
-      "exited": "36",
-      "overall": {
-        "label": "Recorded three- and twelve-month milestones",
-        "kind": "overall",
-        "show_interval": true,
-        "show_point": true,
-        "numerator": "119",
-        "denominator": "282",
-        "estimate": "42",
-        "lower": "37",
-        "upper": "48",
-        "text": "119/282   42% (37–48)"
-      }
+      "head": "Adjustment",
+      "rows": [
+        {
+          "label": "Age, country, three-month day",
+          "estimate": 25.294724609862307,
+          "lower": 11.56596497160254,
+          "upper": 38.95671307914155,
+          "text": "53% vs 27%   25 (12–39)"
+        },
+        {
+          "label": "Centre, period, age, three-month day",
+          "estimate": 24.870124028684653,
+          "lower": 11.71750377750177,
+          "upper": 37.88467977121398,
+          "text": "52% vs 27%   25 (12–38)"
+        },
+        {
+          "label": "Clinical covariates added",
+          "estimate": 22.121103926131134,
+          "lower": 7.388654647821453,
+          "upper": 36.74649552652004,
+          "text": "52% vs 30%   22 (7.4–37)"
+        },
+        {
+          "label": "Clinical covariates, weighted",
+          "estimate": 20.828827624781326,
+          "lower": 5.064131523829904,
+          "upper": 34.68606570645319,
+          "text": "51% vs 30%   21 (5.1–35)"
+        },
+        {
+          "label": "Clinical, no documented interim RT or ADT",
+          "estimate": 24.35267835659735,
+          "lower": 9.359083822916373,
+          "upper": 39.61816936882583,
+          "text": "52% vs 27%   24 (9.4–40)"
+        }
+      ]
     }
   ],
-  "reference_repeat": {
-    "label": "Reference nearest assessment (repeated)",
-    "kind": "overall",
-    "show_interval": true,
-    "show_point": true,
-    "numerator": "86",
-    "denominator": "226",
-    "estimate": "38",
-    "lower": "32",
-    "upper": "45",
-    "text": "86/226   38% (32–45)"
-  },
-  "table1": [
-    [
-      "Both countries combined",
-      "One ordinary pad documented",
-      "110",
-      "64 (59–67)",
-      "94 (87–104)",
-      "375 (348–397)"
-    ],
-    [
-      "Both countries combined",
-      "Two or more ordinary pads documented",
-      "91",
-      "65 (59–70)",
-      "90 (73–99)",
-      "367 (350–380)"
-    ],
-    [
-      "Both countries combined",
-      "Pad quantity unclear, no conflicting evidence",
-      "23",
-      "66 (61–70)",
-      "94 (87–104)",
-      "374 (353–387)"
-    ],
-    [
-      "Both countries combined",
-      "Pad quantity conflicting or invalid",
-      "2",
-      "68 (65–70)",
-      "90 (82–97)",
-      "367 (365–368)"
-    ],
-    [
-      "Poland",
-      "One ordinary pad documented",
-      "41",
-      "64 (59–67)",
-      "87 (76–95)",
-      "383 (365–400)"
-    ],
-    [
-      "Poland",
-      "Two or more ordinary pads documented",
-      "40",
-      "66 (60–69)",
-      "78 (66–97)",
-      "367 (353–377)"
-    ],
-    [
-      "United States",
-      "One ordinary pad documented",
-      "69",
-      "64 (58–67)",
-      "100 (92–107)",
-      "369 (340–388)"
-    ],
-    [
-      "United States",
-      "Two or more ordinary pads documented",
-      "51",
-      "64 (58–71)",
-      "92 (85–99)",
-      "366 (346–384)"
-    ]
-  ],
-  "availability": [
-    {
-      "label": "Overall",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "226",
-      "denominator": "460",
-      "estimate": "49",
-      "text": "226/460   49%"
-    },
-    {
-      "label": "Poland",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "89",
-      "denominator": "199",
-      "estimate": "45",
-      "text": "89/199   45%"
-    },
-    {
-      "label": "United States",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "137",
-      "denominator": "261",
-      "estimate": "52",
-      "text": "137/261   52%"
-    },
-    {
-      "label": "One ordinary pad documented",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "110",
-      "denominator": "234",
-      "estimate": "47",
-      "text": "110/234   47%"
-    },
-    {
-      "label": "Two or more ordinary pads documented",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "91",
-      "denominator": "178",
-      "estimate": "51",
-      "text": "91/178   51%"
-    },
-    {
-      "label": "Pad quantity unclear, no conflicting evidence",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "23",
-      "denominator": "43",
-      "estimate": "53",
-      "text": "23/43   53%"
-    },
-    {
-      "label": "Pad quantity conflicting or invalid",
-      "kind": "overall",
-      "show_interval": false,
-      "show_point": true,
-      "numerator": "2",
-      "denominator": "5",
-      "estimate": "40",
-      "text": "2/5   40%"
-    }
-  ],
-  "calendar": [
-    [
-      "2017",
-      "1",
-      "0",
-      "1"
-    ],
-    [
-      "2019",
-      "2",
-      "0",
-      "2"
-    ],
-    [
-      "2020",
-      "3",
-      "1",
-      "4"
-    ],
-    [
-      "2021",
-      "14",
-      "8",
-      "22"
-    ],
-    [
-      "2022",
-      "28",
-      "17",
-      "45"
-    ],
-    [
-      "2023",
-      "49",
-      "42",
-      "91"
-    ],
-    [
-      "2024",
-      "105",
-      "79",
-      "184"
-    ],
-    [
-      "2025",
-      "24",
-      "83",
-      "107"
-    ],
-    [
-      "2026",
-      "0",
-      "4",
-      "4"
-    ],
-    [
-      "Total",
-      "226",
-      "234",
-      "460"
-    ]
-  ],
-  "periods": [
-    [
-      "2017–2024",
-      "202",
-      "147",
-      "349"
-    ],
-    [
-      "2025–2026",
-      "24",
-      "87",
-      "111"
-    ]
-  ],
-  "span": [
-    [
-      "With a one-year record",
-      "226",
-      "609 (393–797)"
-    ],
-    [
-      "Without a one-year record",
-      "234",
-      "187 (100–470)"
-    ]
-  ],
-  "unresolved": [],
-  "meta": {
-    "early_0": "60",
-    "early_1": "120",
-    "early_target": "90",
-    "year_0": "305",
-    "year_1": "425",
-    "year_target": "365",
-    "narrow_early_0": "75",
-    "narrow_early_1": "105",
-    "narrow_year_0": "335",
-    "narrow_year_1": "395",
-    "confidence": "95",
-    "draws": "2000",
-    "no_valid_year_window_observation": "233",
-    "conflicting_year_window_evidence_only": "1",
-    "period_early_label": "2017–2024",
-    "period_late_label": "2025–2026",
-    "earlier_with": "202",
-    "earlier_total": "349",
-    "earlier_start": "2017",
-    "earlier_end": "2024",
-    "later_with": "24",
-    "later_total": "111",
-    "later_start": "2025",
-    "later_end": "2026"
+  "missing_outcome": {
+    "one_early_users": 189,
+    "one_events": 54,
+    "one_observed": 104,
+    "one_unobserved": 85,
+    "two_early_users": 137,
+    "two_events": 24,
+    "two_observed": 85,
+    "two_unobserved": 52,
+    "symmetric_shift_tipping_delta": 0.28563673458808514,
+    "observed_difference": 0.2368778280542987,
+    "lower_bound": -0.26903023983315955
   },
   "axes": {
-    "role": "Non-study rendering constants. These are axis graduations, never study estimates.",
+    "role": "Non-study rendering and display-schema constants. These are axis graduations, contour steps, or structural scale bounds, never study estimates.",
     "proportion_axis": [
       0,
       25,
@@ -623,6 +572,77 @@
       20,
       40,
       60
+    ],
+    "difference_axis_signed": [
+      -20,
+      0,
+      20,
+      40,
+      60
+    ],
+    "contour_levels_pct": [
+      -20,
+      -10,
+      0,
+      10,
+      20,
+      30,
+      40,
+      50
+    ],
+    "axis_s1_days": [
+      0,
+      90,
+      180,
+      365,
+      730,
+      800
+    ],
+    "zero_day": 0,
+    "milestone_months": [
+      3,
+      12
+    ],
+    "panel_b_min_label_pct": 8,
+    "p_threshold_small": "0.001",
+    "epic_cp_scale": [
+      0,
+      12
+    ],
+    "complication_days": [
+      30,
+      90
+    ],
+    "stage_max": 4,
+    "asa_classes": [
+      2,
+      3,
+      4
+    ],
+    "covariate_scales": {
+      "age_years": 10,
+      "age_center": 65,
+      "day_step": 30,
+      "bmi_step": 5,
+      "bmi_center": 28,
+      "volume_step": 10,
+      "volume_center": 40,
+      "surgeon_doubling": 2,
+      "surgeon_center": 32
+    },
+    "calibration_slope_ideal": 1,
+    "one_point_rounding": 1,
+    "unit_square_step_pct": 1,
+    "percent_100": 100,
+    "table_numbers": [
+      1,
+      2
+    ],
+    "table1_year_fallback_only": [
+      2017,
+      2024,
+      2025
     ]
-  }
+  },
+  "unresolved": []
 }

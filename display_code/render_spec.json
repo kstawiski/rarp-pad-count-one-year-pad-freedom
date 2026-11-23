@@ -1,0 +1,33 @@
+{
+  "role": "Non-study rendering and display-schema constants. These are axis graduations, contour steps, or structural scale bounds, never study estimates.",
+  "proportion_axis": [0, 25, 50, 75, 100],
+  "difference_axis": [0, 20, 40, 60],
+  "difference_axis_signed": [-20, 0, 20, 40, 60],
+  "contour_levels_pct": [-20, -10, 0, 10, 20, 30, 40, 50],
+  "axis_s1_days": [0, 90, 180, 365, 730, 800],
+  "zero_day": 0,
+  "milestone_months": [3, 12],
+  "panel_b_min_label_pct": 8,
+  "p_threshold_small": "0.001",
+  "epic_cp_scale": [0, 12],
+  "complication_days": [30, 90],
+  "stage_max": 4,
+  "asa_classes": [2, 3, 4],
+  "covariate_scales": {
+    "age_years": 10,
+    "age_center": 65,
+    "day_step": 30,
+    "bmi_step": 5,
+    "bmi_center": 28,
+    "volume_step": 10,
+    "volume_center": 40,
+    "surgeon_doubling": 2,
+    "surgeon_center": 32
+  },
+  "calibration_slope_ideal": 1,
+  "one_point_rounding": 1,
+  "unit_square_step_pct": 1,
+  "percent_100": 100,
+  "table_numbers": [1, 2],
+  "table1_year_fallback_only": [2017, 2024, 2025]
+}

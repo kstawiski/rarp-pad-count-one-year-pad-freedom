@@ -1,49 +1,55 @@
+user_lib <- '/home/konrad/R/x86_64-pc-linux-gnu-library/4.6'
+if (dir.exists(user_lib) && !(user_lib %in% .libPaths())) {
+  .libPaths(c(user_lib, .libPaths()))
+}
+
 suppressPackageStartupMessages({
   library(ggplot2)
   library(ragg)
   library(jsonlite)
   library(systemfonts)
+  library(svglite)
+  library(digest)
 })
 
-if (!("Open Sans" %in% tryCatch(unique(systemfonts::system_fonts()$family), error = function(e) "Open Sans"))) {
-  warning("Open Sans not confirmed via systemfonts; rendering anyway (v4 adaptation: systemfonts unavailable, font verified present via fc-list).")
+font_dir <- '/home/konrad/.cache/R/renv/library/OmicSelector-c9f55c96/linux-ubuntu-noble/R-4.5/x86_64-pc-linux-gnu/rmarkdown/rmd/h/bootstrap/css/fonts'
+if (!('Open Sans' %in% tryCatch(unique(systemfonts::system_fonts()$family), error = function(e) character()))) {
+  if (file.exists(file.path(font_dir, 'OpenSans.ttf'))) {
+    systemfonts::register_font(
+      name = 'Open Sans',
+      plain = file.path(font_dir, 'OpenSans.ttf'),
+      bold = file.path(font_dir, 'OpenSansBold.ttf'),
+      italic = file.path(font_dir, 'OpenSansItalic.ttf'),
+      bolditalic = file.path(font_dir, 'OpenSansBoldItalic.ttf')
+    )
+  }
 }
-postcddp_font_family <- "Open Sans"
+postcddp_font_family <- 'Open Sans'
 
-# base_size = 8 is the print default (author at FINAL physical size; point sizes are
-# absolute and only correct at 1:1 placement). It yields ticks 7 pt, axis titles 9 pt,
-# title 10 pt. Do NOT raise it to make text "readable" on a preview; enlarge the figure
-# instead. Never build oversized then downscale (that is what drops text below the
-# 6 pt floor).
 theme_postcddp <- function(base_size = 8,
                            base_family = postcddp_font_family,
-                           grid_col = "#d7d7d7") {
+                           grid_col = '#d7d7d7') {
   theme_minimal(base_size = base_size, base_family = base_family) +
     theme(
-      plot.title = element_text(face = "bold", size = base_size + 2, color = "#1a1a1a"),
-      plot.subtitle = element_text(size = base_size + 1, color = "#3b3b3b"),
-      plot.caption = element_text(size = base_size - 2, color = "#5a5a5a"),
-      axis.title = element_text(face = "bold", size = base_size + 1, color = "#222222"),
-      axis.text = element_text(size = base_size - 1, color = "#222222"),
-      legend.title = element_text(face = "bold", size = base_size),
+      plot.title = element_text(face = 'bold', size = base_size + 1.5, color = '#1a1a1a'),
+      plot.subtitle = element_text(size = base_size + 0.5, color = '#3b3b3b'),
+      plot.caption = element_text(size = base_size - 1, color = '#5a5a5a'),
+      axis.title = element_text(face = 'bold', size = base_size + 0.5, color = '#222222'),
+      axis.text = element_text(size = base_size - 1, color = '#222222'),
+      legend.title = element_text(face = 'bold', size = base_size),
       legend.text = element_text(size = base_size - 1),
-      strip.text = element_text(face = "bold", size = base_size),
+      strip.text = element_text(face = 'bold', size = base_size),
       panel.grid.major = element_line(color = grid_col, linewidth = 0.4),
       panel.grid.minor = element_blank(),
-      legend.position = "bottom",
-      legend.key.size = unit(0.8, "lines"),
-      legend.spacing.y = unit(1, "pt"),
-      panel.spacing = unit(3, "pt"),
-      plot.margin = margin(2, 2, 2, 2, "mm"),
-      plot.title.position = "plot",
-      text = element_text(lineheight = 0.9)
+      legend.position = 'bottom',
+      legend.key.size = unit(0.8, 'lines'),
+      legend.spacing.y = unit(1, 'pt'),
+      panel.spacing = unit(3, 'pt'),
+      plot.margin = margin(2, 2, 2, 2, 'mm'),
+      plot.title.position = 'plot',
+      text = element_text(lineheight = 0.95)
     )
 }
-
-# Callers should still add, per plot, to defeat trapped whitespace and stretch:
-#   scale_x/y_continuous(expand = expansion(mult = c(0, 0.02)))  # or c(0,0) for bar baselines
-# For sparse data, set theme(aspect.ratio = <scientifically appropriate ratio>)
-# instead of stretching the panel to fill an arbitrary canvas.
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
@@ -55,7 +61,7 @@ range_or_null <- function(x) {
 }
 
 panel_axis_range <- function(panel_params, axis) {
-  direct <- panel_params[[paste0(axis, ".range")]] %||% panel_params[[paste0(axis, "_range")]]
+  direct <- panel_params[[paste0(axis, '.range')]] %||% panel_params[[paste0(axis, '_range')]]
   if (!is.null(direct)) return(unname(as.numeric(direct)))
   scale_obj <- panel_params[[axis]]
   if (is.list(scale_obj)) {
@@ -66,19 +72,19 @@ panel_axis_range <- function(panel_params, axis) {
 }
 
 emit_ggplot_geometry <- function(plot, stem, render_path,
-                                 out_dir = "figures/qc",
+                                 out_dir = 'figures/qc',
                                  intentional_crops = list()) {
-  if (!file.exists(render_path)) stop("render_path does not exist: ", render_path)
+  if (!file.exists(render_path)) stop('render_path does not exist: ', render_path)
   built <- ggplot_build(plot)
   panels <- lapply(seq_along(built$layout$panel_params), function(panel_i) {
     pp <- built$layout$panel_params[[panel_i]]
     panel_layers <- lapply(seq_along(built$data), function(layer_i) {
       df <- built$data[[layer_i]]
-      if ("PANEL" %in% names(df)) {
+      if ('PANEL' %in% names(df)) {
         df <- df[df$PANEL == panel_i, , drop = FALSE]
       }
       layer <- list(
-        layer = paste0(class(plot$layers[[layer_i]]$geom)[1], ":", layer_i),
+        layer = paste0(class(plot$layers[[layer_i]]$geom)[1], ':', layer_i),
         x = range_or_null(df$x),
         y = range_or_null(df$y),
         xmin = range_or_null(df$xmin),
@@ -94,48 +100,48 @@ emit_ggplot_geometry <- function(plot, stem, render_path,
     })
     list(
       panel = as.character(panel_i),
-      xlim = panel_axis_range(pp, "x"),
-      ylim = panel_axis_range(pp, "y"),
+      xlim = panel_axis_range(pp, 'x'),
+      ylim = panel_axis_range(pp, 'y'),
       layers = panel_layers,
       intentional_crops = intentional_crops
     )
   })
   geometry <- list(
-    schema_version = "figure-geometry-v1",
+    schema_version = 'figure-geometry-v1',
     figure = stem,
-    render_sha256 = digest::digest(file = render_path, algo = "sha256"),
+    render_sha256 = digest::digest(file = render_path, algo = 'sha256'),
     panels = panels
   )
   dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-  out_path <- file.path(out_dir, paste0(stem, "_geometry.json"))
-  jsonlite::write_json(geometry, out_path, auto_unbox = TRUE, pretty = TRUE, null = "null")
+  out_path <- file.path(out_dir, paste0(stem, '_geometry.json'))
+  jsonlite::write_json(geometry, out_path, auto_unbox = TRUE, pretty = TRUE, null = 'null')
   assert_no_geometry_clip(geometry)
   invisible(geometry)
 }
 
 geometry_extent <- function(layer, axis) {
-  keys <- if (axis == "x") c("x", "xmin", "xmax", "xend") else
-    c("y", "ymin", "ymax", "yend", "ymin_final", "ymax_final")
+  keys <- if (axis == 'x') c('x', 'xmin', 'xmax', 'xend') else
+    c('y', 'ymin', 'ymax', 'yend', 'ymin_final', 'ymax_final')
   vals <- unlist(layer[intersect(keys, names(layer))], use.names = FALSE)
   range_or_null(vals)
 }
 
 crop_declared <- function(crops, layer, axis) {
   if (!length(crops)) return(FALSE)
-  layer_id <- layer$layer %||% ""
+  layer_id <- layer$layer %||% ''
   any(vapply(crops, function(crop) {
     if (!is.list(crop)) return(FALSE)
-    crop_axis <- crop$axis %||% crop$axes %||% ""
-    crop_layer <- crop$layer %||% crop$layer_id %||% "*"
-    axis %in% crop_axis && (identical(crop_layer, "*") || identical(crop_layer, layer_id))
+    crop_axis <- crop$axis %||% crop$axes %||% ''
+    crop_layer <- crop$layer %||% crop$layer_id %||% '*'
+    axis %in% crop_axis && (identical(crop_layer, '*') || identical(crop_layer, layer_id))
   }, logical(1)))
 }
 
 assert_no_geometry_clip <- function(geometry, margin_mult = 1e-6) {
   problems <- character()
   for (panel in geometry$panels) {
-    for (axis in c("x", "y")) {
-      lim <- panel[[paste0(axis, "lim")]]
+    for (axis in c('x', 'y')) {
+      lim <- panel[[paste0(axis, 'lim')]]
       if (is.null(lim) || length(lim) != 2) next
       tol <- max(abs(diff(as.numeric(lim))) * margin_mult, 1e-9)
       for (layer in panel$layers) {
@@ -143,37 +149,12 @@ assert_no_geometry_clip <- function(geometry, margin_mult = 1e-6) {
         if (is.null(ext) || crop_declared(panel$intentional_crops, layer, axis)) next
         if (ext[1] < lim[1] - tol || ext[2] > lim[2] + tol) {
           problems <- c(problems, sprintf(
-            "panel %s layer %s axis %s extent [%g, %g] outside view [%g, %g]",
+            'panel %s layer %s axis %s extent [%g, %g] outside view [%g, %g]',
             panel$panel, layer$layer, axis, ext[1], ext[2], lim[1], lim[2]))
         }
       }
     }
   }
-  if (length(problems)) stop(paste(problems, collapse = "\n"), call. = FALSE)
+  if (length(problems)) stop(paste(problems, collapse = '\n'), call. = FALSE)
   invisible(TRUE)
-}
-
-save_plot <- function(path, plot, width, height, units = "mm", dpi = 320, bg = "white",
-                      emit_geometry = TRUE, geometry_stem = NULL,
-                      intentional_crops = list(), ...) {
-  # units defaults to "mm" — callers pass the exact print size in mm (author at final
-  # size). ggsave() itself defaults to inches, so ALWAYS pass units through.
-  ggplot2::ggsave(
-    filename = path,
-    plot = plot,
-    width = width,
-    height = height,
-    units = units,
-    dpi = dpi,
-    device = ragg::agg_png,
-    bg = bg,
-    ...
-  )
-  if (isTRUE(emit_geometry)) {
-    stem <- geometry_stem %||% tools::file_path_sans_ext(basename(path))
-    emit_ggplot_geometry(
-      plot, stem = stem, render_path = path,
-      intentional_crops = intentional_crops
-    )
-  }
 }

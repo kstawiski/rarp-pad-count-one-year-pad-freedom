@@ -1,0 +1,264 @@
+{
+  "all_operations": {
+    "06_derive_observed_assessments": {
+      "all_released": 1497,
+      "conflicting_year_window_evidence_only": 1,
+      "early_status_known": 644,
+      "early_users": 460,
+      "early_users_with_year": 226,
+      "early_users_without_year_status": 234,
+      "historical_selected_row_burden_one": 102,
+      "historical_selected_row_burden_quantity_uncertain": 36,
+      "historical_selected_row_burden_two_or_more": 88,
+      "no_valid_year_window_observation": 233,
+      "paired_early_year": 309,
+      "robotic": 1397,
+      "valid_dated_postoperative_continence": 5376,
+      "year_padfree_observed_pairs": 86
+    },
+    "07_observed_status_estimates": {
+      "early_users": 460,
+      "early_users_with_year": 226,
+      "poland_one_events": 17,
+      "poland_one_n": 41,
+      "poland_two_events": 4,
+      "poland_two_n": 40,
+      "united_states_one_events": 41,
+      "united_states_one_n": 69,
+      "united_states_two_events": 20,
+      "united_states_two_n": 51,
+      "year_padfree_observed_pairs": 86
+    },
+    "10_posthoc_twogroup_analyses": {
+      "classifiable_count": 201,
+      "classifiable_events": 82,
+      "country_standardized_difference": {
+        "tol": 0.005,
+        "value": 0.2474
+      },
+      "difference": {
+        "tol": 0.005,
+        "value": 0.2635
+      },
+      "one_events": 58,
+      "one_n": 110,
+      "overall_events": 86,
+      "pair_count": 226,
+      "two_events": 24,
+      "two_n": 91
+    },
+    "11_selection_followup_sensitivity": {
+      "classifiable_events": 82,
+      "classifiable_n": 201,
+      "early_users": 460,
+      "missing_outcome_lower_bound": {
+        "tol": 0.005,
+        "value": -0.376
+      },
+      "missing_outcome_upper_bound": {
+        "tol": 0.005,
+        "value": 0.643
+      },
+      "range_reliant_one": 0,
+      "range_reliant_two_or_more": 23,
+      "reference_bootstrap_lower": {
+        "tol": 0.0005,
+        "value": 0.1327
+      },
+      "reference_bootstrap_upper": {
+        "tol": 0.0005,
+        "value": 0.3951
+      },
+      "reference_difference": 0.2635364635364635,
+      "reference_newcombe_lower": {
+        "tol": 0.0005,
+        "value": 0.1281
+      },
+      "reference_one_events": 58,
+      "reference_one_n": 110,
+      "reference_pairs": 226,
+      "reference_two_events": 24,
+      "reference_two_n": 91,
+      "robotic": 1397,
+      "robotic_with_early": 644,
+      "robotic_without_early": 753,
+      "symmetric_shift_tipping_delta": 0.25870423707802925
+    },
+    "15_clinical_adjustment": {
+      "events": 82,
+      "interim_treatment_one": 11,
+      "interim_treatment_two_or_more": 9,
+      "n_compared": 201,
+      "two_events": 24,
+      "two_n": 91
+    },
+    "16_strengthening_analyses": {
+      "availability_weighted_difference": {
+        "tol": 0.0001,
+        "value": 0.2297
+      },
+      "availability_weighted_one_pad": {
+        "tol": 0.0001,
+        "value": 0.5044
+      },
+      "availability_weighted_two_or_more": {
+        "tol": 0.0001,
+        "value": 0.2747
+      },
+      "classifiable_n": 201,
+      "clinical_complete_cases": 183,
+      "closed_window_one_early": 189,
+      "closed_window_one_with_year": 104,
+      "closed_window_two_early": 137,
+      "closed_window_two_with_year": 85,
+      "early_users": 460,
+      "one_events": 58,
+      "one_n": 110,
+      "two_events": 24,
+      "two_n": 91,
+      "unclassified_n": 25
+    }
+  },
+  "completed_window": {
+    "06_derive_observed_assessments": {
+      "all_released": 1497,
+      "conflicting_year_window_evidence_only": 1,
+      "early_status_known": 500,
+      "early_users": 364,
+      "early_users_with_year": 213,
+      "early_users_without_year_status": 151,
+      "historical_selected_row_burden_one": 96,
+      "historical_selected_row_burden_quantity_uncertain": 35,
+      "historical_selected_row_burden_two_or_more": 82,
+      "no_valid_year_window_observation": 150,
+      "paired_early_year": 293,
+      "robotic": 1022,
+      "valid_dated_postoperative_continence": 4675,
+      "year_padfree_observed_pairs": 82
+    },
+    "07_observed_status_estimates": {
+      "early_users": 364,
+      "early_users_with_year": 213,
+      "poland_one_events": 16,
+      "poland_one_n": 39,
+      "poland_two_events": 4,
+      "poland_two_n": 37,
+      "united_states_one_events": 38,
+      "united_states_one_n": 65,
+      "united_states_two_events": 20,
+      "united_states_two_n": 48,
+      "year_padfree_observed_pairs": 82
+    },
+    "10_posthoc_twogroup_analyses": {
+      "classifiable_count": 189,
+      "classifiable_events": 78,
+      "country_standardized_difference": 0.22191257191257185,
+      "difference": 0.2368778280542987,
+      "one_events": 54,
+      "one_n": 104,
+      "overall_events": 82,
+      "pair_count": 213,
+      "two_events": 24,
+      "two_n": 85
+    },
+    "11_selection_followup_sensitivity": {
+      "classifiable_events": 78,
+      "classifiable_n": 189,
+      "early_users": 364,
+      "missing_outcome_lower_bound": -0.26903023983315955,
+      "missing_outcome_upper_bound": 0.5602672536979106,
+      "range_reliant_one": 0,
+      "range_reliant_two_or_more": 23,
+      "reference_bootstrap_lower": 0.10076428941141675,
+      "reference_bootstrap_upper": 0.37340297383775634,
+      "reference_difference": 0.2368778280542987,
+      "reference_newcombe_lower": 0.09640820614154524,
+      "reference_one_events": 54,
+      "reference_one_n": 104,
+      "reference_pairs": 213,
+      "reference_two_events": 24,
+      "reference_two_n": 85,
+      "robotic": 1022,
+      "robotic_with_early": 500,
+      "robotic_without_early": 522,
+      "symmetric_shift_tipping_delta": 0.28563673458808514
+    },
+    "15_clinical_adjustment": {
+      "events": 78,
+      "interim_treatment_one": 10,
+      "interim_treatment_two_or_more": 7,
+      "n_compared": 189,
+      "two_events": 24,
+      "two_n": 85
+    },
+    "16_strengthening_analyses": {
+      "availability_weighted_difference": 0.23112533371281418,
+      "availability_weighted_one_pad": 0.5042347736973157,
+      "availability_weighted_two_or_more": 0.27310943998450155,
+      "classifiable_n": 189,
+      "clinical_complete_cases": 171,
+      "closed_window_one_early": 189,
+      "closed_window_one_with_year": 104,
+      "closed_window_two_early": 137,
+      "closed_window_two_with_year": 85,
+      "early_users": 364,
+      "one_events": 54,
+      "one_n": 104,
+      "two_events": 24,
+      "two_n": 85,
+      "unclassified_n": 24
+    },
+    "18_one_year_pad_category": {
+      "early_pad_free_with_year": 80,
+      "early_users": 364,
+      "early_users_with_year": 213,
+      "one_n": 104,
+      "one_year_not_classifiable": 2,
+      "one_year_one": 45,
+      "one_year_pad_free": 54,
+      "one_year_two_or_more": 3,
+      "recovery_after_6m_pad_free_denom": 27,
+      "recovery_after_6m_pad_free_n": 25,
+      "recovery_after_6m_pad_use_denom": 93,
+      "recovery_after_6m_pad_use_n": 27,
+      "still_two_or_more_all_two_denom": 84,
+      "still_two_or_more_all_two_n": 18,
+      "still_two_or_more_one_denom": 102,
+      "still_two_or_more_one_n": 3,
+      "still_two_or_more_three_denom": 37,
+      "still_two_or_more_three_minus_one": 0.321939586645469,
+      "still_two_or_more_three_n": 13,
+      "still_two_or_more_two_denom": 36,
+      "still_two_or_more_two_n": 4,
+      "still_two_or_more_two_or_more_minus_one": 0.18487394957983191,
+      "three_or_more_n": 38,
+      "three_or_more_year_not_classifiable": 1,
+      "three_or_more_year_one": 16,
+      "three_or_more_year_pad_free": 8,
+      "three_or_more_year_two_or_more": 13,
+      "two_n": 36,
+      "two_or_more_all_n": 85,
+      "two_or_more_all_year_not_classifiable": 1,
+      "two_or_more_all_year_one": 42,
+      "two_or_more_all_year_pad_free": 24,
+      "two_or_more_all_year_two_or_more": 18,
+      "two_or_more_unseparated_n": 11,
+      "two_year_not_classifiable": 0,
+      "two_year_one": 17,
+      "two_year_pad_free": 15,
+      "two_year_two_or_more": 4
+    },
+    "19_documentation_and_timing": {
+      "compared_men": 189,
+      "early_users": 364,
+      "eligible_men": 1022,
+      "one_events": 54,
+      "one_n": 104,
+      "one_year_usable": 213,
+      "three_month_usable": 500,
+      "two_events": 24,
+      "two_n": 85,
+      "unclassifiable_n": 24
+    }
+  }
+}

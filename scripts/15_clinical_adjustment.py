@@ -27,6 +27,7 @@ Run from manuscript1/:
   "$PY" -B scripts/15_clinical_adjustment.py --verify   # recompute, no write
 """
 
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -67,6 +68,9 @@ def load(name, filename):
     return module
 
 
+cohort_mod = load('cohort', 'cohort.py')
+
+
 def med_iqr(values):
     v = np.asarray(values, float)
     v = v[~np.isnan(v)]
@@ -88,11 +92,21 @@ def logit(y, X):
     return r
 
 
-def main(argv):
-    verify = '--verify' in argv
+def main(argv=None):
+    ap = argparse.ArgumentParser(description='Post hoc clinically adjusted comparison.')
+    ap.add_argument('--verify', action='store_true')
+    cohort_mod.add_cohort_args(ap)
+    args = ap.parse_args(argv)
+    verify = args.verify
+    cohort_name = args.cohort
+    is_all_ops = cohort_name == cohort_mod.COHORT_ALL_OPERATIONS
+    out_path = cohort_mod.output_path(EVIDENCE, cohort_name)
+    if not verify:
+        cohort_mod.assert_writable_output(out_path)
+
     d = load('drv06', '06_derive_observed_assessments.py')
     E = load('est05', '05_observed_estimators.py')
-    res = d.source_derive()
+    res = d.source_derive(cohort=cohort_name)
     if res['source_verification']['bound_inputs_before'] != 122:
         fail('BOUND_INPUT_COUNT')
     ID = d.ID
@@ -113,8 +127,6 @@ def main(argv):
 
     y = f['_year_status'].eq(1).astype(float).to_numpy()
     two = f['_burden'].astype(str).eq('two_or_more').to_numpy()
-    if len(f) != 201 or int(y.sum()) != 82 or int(two.sum()) != 91 or int(y[two].sum()) != 24:
-        fail('REFERENCE_COUNTS')
 
     def num(col):
         return pd.to_numeric(w[col].str.strip().replace('', np.nan), errors='coerce').to_numpy(float)
@@ -128,8 +140,19 @@ def main(argv):
     year = pd.to_numeric(f['_year_day'], errors='coerce').to_numpy(float)
     with np.errstate(invalid='ignore'):
         interim = ~np.isnan(t_off) & (t_off > early) & (t_off <= year)
-    if int(interim[~two].sum()) != 11 or int(interim[two].sum()) != 9:
-        fail('INTERIM_TREATMENT_CALIBRATION', f'{int(interim[~two].sum())} {int(interim[two].sum())}')
+    observed_gates = {
+        'n_compared': int(len(f)),
+        'events': int(y.sum()),
+        'two_n': int(two.sum()),
+        'two_events': int(y[two].sum()),
+        'interim_treatment_one': int(interim[~two].sum()),
+        'interim_treatment_two_or_more': int(interim[two].sum()),
+    }
+    try:
+        cohort_mod.check_or_record_gates(
+            '15_clinical_adjustment', cohort_name, observed_gates, record=args.record_gates)
+    except cohort_mod.GateError as exc:
+        fail(exc.code, exc.detail)
 
     centre = w['operation_centre'].astype(str).to_numpy()
     if set(centre) - CENTRES:
@@ -155,7 +178,7 @@ def main(argv):
         'early_day_per30_cent90': (early - 90.0) / 30.0,
         'centre_belchatow': (centre == 'Bełchatów').astype(float),
         'centre_salve': (centre == 'Salve Medica').astype(float),
-        'period_recent': (surgery.dt.year.to_numpy() >= 2025).astype(float),
+        'period_recent': (surgery.dt.year.to_numpy() >= cohort_mod.recent_period_start_year(cohort_name)).astype(float),
         'nerve_sparing_not_performed': (ns == 'not_performed').astype(float),
         'nerve_sparing_not_stated': np.isin(ns, ['not_assessed', 'unknown_after_review']).astype(float),
         'pt3_or_higher': flag(np.nan_to_num(pt) >= 2, pt),
@@ -288,9 +311,9 @@ def main(argv):
     record = {
         'analysis_id': 'M1-CLINICAL-ADJUSTMENT', 'amendment': 'A-OBS-4', 'status': 'exploratory_post_hoc_disclosed',
         'draws': DRAWS, 'reference_seed': REFERENCE_SEED, 'seeds': SEEDS,
-        'n_compared': 201, 'events': 82,
+        'n_compared': int(len(f)), 'events': int(y.sum()),
         'covariate_sets': {'clinical': CLINICAL, 'united_states': UNITED_STATES},
-        'by_group_201': {
+        'by_group_201' if is_all_ops else 'by_group': {
             'pathological_stage': by_group(pt_label, 'category'),
             'final_isup_grade_group': by_group(isup_label, 'category'),
             'nerve_sparing_state': by_group(ns, 'category'),
@@ -315,17 +338,29 @@ def main(argv):
                           'model': gcomp(us_complete, UNITED_STATES, SEEDS['united_states'])},
         'code_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
+    if not is_all_ops:
+        record['cohort'] = res['cohort']
     text = json.dumps(record, indent=2, sort_keys=True, ensure_ascii=False)
     for p in id_set:
         if p and len(p) > 3 and p in text:
             fail('IDENTIFIER_LEAK')
+    max_float_diff = 0.0
     if verify:
-        if json.loads(EVIDENCE.read_text()) != json.loads(text):
+        if not out_path.is_file():
+            fail('SAVED_RECORD_MISMATCH', 'missing_output')
+        saved = out_path.read_text()
+        if is_all_ops:
+            ok, reason, max_float_diff = cohort_mod.compare_records_ignoring_provenance(
+                json.loads(saved), json.loads(text), ignore_keys=('code_sha256',), float_tol=1e-12)
+            if not ok:
+                fail('SAVED_RECORD_MISMATCH', reason)
+        elif json.loads(saved) != json.loads(text):
             fail('SAVED_RECORD_MISMATCH')
-        print(json.dumps({'status': 'saved_clinical_adjustment_recomputed_exactly'}))
+        print(json.dumps({'status': 'saved_clinical_adjustment_recomputed_exactly', 'cohort': cohort_name,
+                          'max_float_diff': max_float_diff}))
         return 0
-    EVIDENCE.write_text(text)
-    print(json.dumps({'status': 'written', 'path': str(EVIDENCE)}))
+    out_path.write_text(text)
+    print(json.dumps({'status': 'written', 'cohort': cohort_name, 'path': str(out_path)}))
     return 0
 
 

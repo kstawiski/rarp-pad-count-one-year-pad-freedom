@@ -6,6 +6,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import subprocess
 import sys
 import warnings
 import pandas as pd
@@ -182,6 +183,29 @@ def select_window(frame, window):
     return x, diagnostics
 
 
+def sealed_digest(path):
+    """Byte count and SHA-256 of the plaintext of a bound input kept sealed as PATH.age.
+
+    Patient-level provenance files of the release are stored encrypted. The plaintext is
+    streamed through the hash and never written or returned.
+    """
+    sealed = path.with_name(path.name + '.age')
+    if sealed.is_symlink() or not sealed.is_file():
+        return None
+    try:
+        proc = subprocess.Popen(['phi', 'cat', str(sealed)], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    except OSError:
+        return None
+    h = hashlib.sha256()
+    size = 0
+    for block in iter(lambda: proc.stdout.read(1 << 20), b''):
+        h.update(block)
+        size += len(block)
+    if proc.wait() != 0:
+        return None
+    return size, h.hexdigest()
+
+
 def verify_sources(manifest):
     mismatches = 0
     for entry in manifest['files']:
@@ -189,7 +213,12 @@ def verify_sources(manifest):
         if rel.is_absolute() or '..' in rel.parts:
             raise RuntimeError('INVALID_MANIFEST_PATH')
         path = WORKSPACE / rel
-        if path.is_symlink() or not path.is_file() or path.stat().st_size != entry['bytes'] or sha(path) != entry['sha256']:
+        if path.is_symlink():
+            mismatches += 1
+        elif path.is_file():
+            if path.stat().st_size != entry['bytes'] or sha(path) != entry['sha256']:
+                mismatches += 1
+        elif sealed_digest(path) != (entry['bytes'], entry['sha256']):
             mismatches += 1
     if mismatches:
         raise RuntimeError('BOUND_INPUT_MISMATCH')

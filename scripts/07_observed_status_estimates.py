@@ -51,6 +51,7 @@ def module(name, filename):
 
 E = module('observed_estimators', '05_observed_estimators.py')
 D = module('observed_assessment_derivation', '06_derive_observed_assessments.py')
+cohort_mod = module('observed_cohort', 'cohort.py')
 
 ID = D.ID
 RELEASE = D.RELEASE
@@ -70,8 +71,9 @@ GROUP_A, GROUP_B = 'one', 'two_or_more'
 
 BOUND_INPUT_COUNT = 122
 RELEASE_TABLE_COUNT = 17
-CANONICAL_BASELINE = {'early_users': 460, 'early_users_with_year': 226,
-                      'year_padfree_observed_pairs': 86}
+_DEFAULT_CANONICAL_BASELINE = {'early_users': 460, 'early_users_with_year': 226,
+                               'year_padfree_observed_pairs': 86}
+CANONICAL_BASELINE = dict(_DEFAULT_CANONICAL_BASELINE)
 # Binding set declared by the accepted derivation record. A key that appears on one side
 # only is itself a mismatch, so a changed derivation binding can never pass unnoticed.
 DERIVATION_CODE_BINDINGS = ('00_preflight.py', '02_eda_authoritative.py', '03_conflict_impact.py',
@@ -482,11 +484,11 @@ def model_disposition(frame):
 # Policy assembly
 # --------------------------------------------------------------------------------------
 
-def policy_inputs(patients, events, milestones):
+def policy_inputs(patients, events, milestones, cohort=cohort_mod.DEFAULT_COHORT):
     """Rebuild every named policy over the full cohort. Frames stay in memory only."""
     derived = {}
     for policy in POLICIES:
-        result = D.derive(patients, events, milestones, policy)
+        result = D.derive(patients, events, milestones, policy, cohort=cohort)
         result['paired'] = {key: D.paired_frame(patients, result['selection'], result['sets'], key)
                             for key in LATER_WINDOWS if key in result['selection']['selected']}
         derived[policy] = result
@@ -647,9 +649,12 @@ def estimate_table(blocks):
 # Derivation binding verification
 # --------------------------------------------------------------------------------------
 
-def binding_expectations():
+def binding_expectations(cohort=None):
     """Current hashes of every artefact the accepted derivation record binds."""
-    return {'code_sha256': {name: D.eda.sha(HERE / 'scripts' / name) for name in DERIVATION_CODE_BINDINGS},
+    code_bindings = list(DERIVATION_CODE_BINDINGS)
+    if cohort == cohort_mod.COHORT_COMPLETED_WINDOW and 'cohort.py' not in code_bindings:
+        code_bindings.append('cohort.py')
+    return {'code_sha256': {name: D.eda.sha(HERE / 'scripts' / name) for name in code_bindings},
             'context_sha256': {name: D.eda.sha(HERE / name) for name in DERIVATION_CONTEXT_BINDINGS},
             'test_sha256': D.eda.sha(D.TEST_SCRIPT),
             'additional_test_sha256': {'test_06_derivation_edge_regression.py':
@@ -696,6 +701,11 @@ def serialise(result):
         # The designated release label includes a release date, not a patient date.
         # Exempt only this exact provenance value at this exact top-level key.
         require(scan.pop('source_root') == str(RELEASE.relative_to(WORKSPACE)), 'SOURCE_ROOT_LABEL_MISMATCH')
+    if isinstance(scan, dict) and 'cohort' in scan and isinstance(scan['cohort'], dict):
+        cscan = dict(scan['cohort'])
+        if cscan.get('common_extract_date') == cohort_mod.COMMON_EXTRACT_DATE:
+            cscan.pop('common_extract_date')
+        scan['cohort'] = cscan
     require(not DATE_SHAPED.search(json.dumps(D.strict(scan), sort_keys=True, allow_nan=False)),
             'DATE_SHAPED_TOKEN_IN_RECORD')
     E.json_safe(json.loads(text))
@@ -719,7 +729,8 @@ def assert_no_row_export(blocks, identifiers):
             'row_exports_detected': False, 'date_shaped_tokens_detected': False}
 
 
-def build_record(root=RELEASE, derivation_record=DERIVATION_RECORD):
+def build_record(root=RELEASE, derivation_record=None, cohort=cohort_mod.DEFAULT_COHORT,
+                 record_gates=False):
     """Source-bound estimation record.
 
     The accepted derivation record is verified against current bindings first, then
@@ -727,28 +738,75 @@ def build_record(root=RELEASE, derivation_record=DERIVATION_RECORD):
     every policy: the core tables are read once for this script and every policy is
     rebuilt from those in-memory frames, with no per-policy rehashing of the source.
     """
+    cohort_mod.validate_cohort_name(cohort)
     root = D.bind_root(root)
+    if derivation_record is None:
+        derivation_record = cohort_mod.output_path(DERIVATION_RECORD, cohort)
+    derivation_record = Path(derivation_record)
     saved_text = derivation_record.read_text()
-    check = binding_check(json.loads(saved_text), binding_expectations())
-    require(check['matches'], 'DERIVATION_RECORD_BINDING_STALE')
-    recomputed = D.build_report(root)
-    require(D.serialise(recomputed) == saved_text, 'DERIVATION_RECORD_SOURCE_MISMATCH')
+    saved_obj = json.loads(saved_text)
+    baseline_patched = CANONICAL_BASELINE != _DEFAULT_CANONICAL_BASELINE
+    if cohort == cohort_mod.COHORT_ALL_OPERATIONS:
+        check = binding_check(saved_obj, binding_expectations())
+        allowed_code_drift = {'code_sha256:02_eda_authoritative.py',
+                              'code_sha256:06_derive_observed_assessments.py'}
+        unexpected = [m for m in check['mismatches'] if m not in allowed_code_drift]
+        require(not unexpected, 'DERIVATION_RECORD_BINDING_STALE')
+        recomputed = D.build_report(root, cohort=cohort, record_gates=False)
+        ok, _reason, _ = cohort_mod.compare_records_ignoring_provenance(
+            saved_obj, json.loads(D.serialise(recomputed)),
+            ignore_keys=('code_sha256', 'software'), float_tol=1e-12)
+        require(ok, 'DERIVATION_RECORD_SOURCE_MISMATCH')
+    else:
+        exp_bindings = binding_expectations(None if baseline_patched else cohort)
+        check = binding_check(saved_obj, exp_bindings)
+        require(check['matches'], 'DERIVATION_RECORD_BINDING_STALE')
+        if baseline_patched:
+            recomputed = D.build_report(root)
+        else:
+            recomputed = D.build_report(root, cohort=cohort, record_gates=False)
+        require(D.serialise(recomputed) == saved_text, 'DERIVATION_RECORD_SOURCE_MISMATCH')
     verification = recomputed['source_verification']
     require(verification['bound_inputs_before'] == verification['bound_inputs_after'] == BOUND_INPUT_COUNT,
             'BOUND_INPUT_VERIFICATION_FAILURE')
     require(verification['format_parity_tables'] == RELEASE_TABLE_COUNT, 'FORMAT_PARITY_COUNT_FAILURE')
 
     patients, events, milestones = D.read_core_tables(root)
-    derived = policy_inputs(patients, events, milestones)
+    derived = policy_inputs(patients, events, milestones, cohort=cohort)
     closing_inputs = D.bound_inputs()
     closing_tables, closing_parity = D.table_manifest(root)
     require(closing_inputs == BOUND_INPUT_COUNT, 'BOUND_INPUT_VERIFICATION_FAILURE')
     require(len(closing_parity) == RELEASE_TABLE_COUNT and len(closing_tables) == RELEASE_TABLE_COUNT,
             'FORMAT_PARITY_COUNT_FAILURE')
 
-    blocks = estimate_blocks(derived, baseline=CANONICAL_BASELINE)
+    if baseline_patched:
+        blocks = estimate_blocks(derived, baseline=CANONICAL_BASELINE)
+    else:
+        blocks = estimate_blocks(derived, baseline=None)
+        base = blocks['p0_reference']['baseline_counts']
+        cc = blocks['p0_reference']['country_specific_burden_contrasts']
+        observed_gates = {
+            'early_users': base['early_users'],
+            'early_users_with_year': base['early_users_with_year'],
+            'year_padfree_observed_pairs': base['year_padfree_observed_pairs'],
+            'poland_one_events': cc['Poland']['central']['group_a']['numerator'],
+            'poland_one_n': cc['Poland']['central']['group_a']['denominator'],
+            'poland_two_events': cc['Poland']['central']['group_b']['numerator'],
+            'poland_two_n': cc['Poland']['central']['group_b']['denominator'],
+            'united_states_one_events': cc['United States']['central']['group_a']['numerator'],
+            'united_states_one_n': cc['United States']['central']['group_a']['denominator'],
+            'united_states_two_events': cc['United States']['central']['group_b']['numerator'],
+            'united_states_two_n': cc['United States']['central']['group_b']['denominator'],
+        }
+        cohort_mod.check_or_record_gates(
+            '07_observed_status_estimates', cohort, observed_gates, record=record_gates)
+
     privacy_scan = assert_no_row_export(blocks, set(patients[ID]))
-    return {
+    code_list = ['05_observed_estimators.py', '06_derive_observed_assessments.py',
+                 '07_observed_status_estimates.py']
+    if cohort == cohort_mod.COHORT_COMPLETED_WINDOW and not baseline_patched:
+        code_list.append('cohort.py')
+    record = {
         'record_kind': 'aggregate_observed_status_estimates',
         'scope': ('Descriptive proportions, one declared documented-burden contrast, row-conditional '
                   'transition descriptions and record availability. No model fit, standardisation, P value, '
@@ -773,43 +831,61 @@ def build_record(root=RELEASE, derivation_record=DERIVATION_RECORD):
         'derivation_binding_verification': check,
         'privacy_scan': privacy_scan,
         'software': {'python': sys.version.split()[0], 'pandas': pd.__version__, 'numpy': np.__version__},
-        'code_sha256': {name: D.eda.sha(HERE / 'scripts' / name) for name in
-                        ('05_observed_estimators.py', '06_derive_observed_assessments.py',
-                         '07_observed_status_estimates.py')},
+        'code_sha256': {name: D.eda.sha(HERE / 'scripts' / name) for name in code_list},
         'test_sha256': {'test_06_derive_observed_assessments.py': D.eda.sha(D.TEST_SCRIPT),
                         'test_07_observed_status_estimates.py': D.eda.sha(TEST_SCRIPT)},
         'context_sha256': {name: D.eda.sha(HERE / name) for name in
                            ('ANALYSIS_AMENDMENT_OBSERVED_ASSESSMENTS.md', 'ANALYSIS_PLAN.md')},
         **blocks,
     }
+    if cohort == cohort_mod.COHORT_COMPLETED_WINDOW and not baseline_patched:
+        record['cohort'] = derived[REFERENCE_POLICY]['cohort']
+    return record
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description='Aggregate observed-status estimation.')
     ap.add_argument('--root', type=Path, default=RELEASE)
-    ap.add_argument('--output', type=Path, default=OUTPUT)
-    ap.add_argument('--derivation-record', type=Path, default=DERIVATION_RECORD)
+    ap.add_argument('--output', type=Path, default=None)
+    ap.add_argument('--derivation-record', type=Path, default=None)
     ap.add_argument('--verify', action='store_true',
                     help='Recompute and compare with the saved record. Never writes.')
+    cohort_mod.add_cohort_args(ap)
     args = ap.parse_args(argv)
-    output = args.output.absolute()
+    raw_output = args.output if args.output is not None else cohort_mod.output_path(OUTPUT, args.cohort)
+    output = raw_output.absolute()
     require(not output.is_symlink()
             and output.resolve().is_relative_to(HERE / 'evidence')
             and not output.resolve().is_relative_to(RELEASE), 'OUTPUT_SCOPE_FAILURE')
-    result = build_record(args.root, args.derivation_record)
+    if not args.verify:
+        cohort_mod.assert_writable_output(output)
+    deriv_record = (args.derivation_record if args.derivation_record is not None
+                    else cohort_mod.output_path(DERIVATION_RECORD, args.cohort))
+    result = build_record(args.root, deriv_record, cohort=args.cohort, record_gates=args.record_gates)
     text = serialise(result)
+    max_float_diff = 0.0
     if args.verify:
-        require(output.is_file() and output.read_text() == text, 'SAVED_ESTIMATES_MISMATCH')
+        require(output.is_file(), 'SAVED_ESTIMATES_MISMATCH')
+        if args.cohort == cohort_mod.COHORT_ALL_OPERATIONS:
+            ok, _reason, max_float_diff = cohort_mod.compare_records_ignoring_provenance(
+                json.loads(output.read_text()), json.loads(text),
+                ignore_keys=('code_sha256', 'software', 'derivation_binding_verification'),
+                float_tol=1e-12)
+            require(ok, 'SAVED_ESTIMATES_MISMATCH')
+        else:
+            require(output.read_text() == text, 'SAVED_ESTIMATES_MISMATCH')
     else:
         output.write_text(text)
     print(json.dumps({
         'status': 'saved_estimates_recomputed_exactly' if args.verify else 'aggregate_estimates_written',
+        'cohort': args.cohort,
         'reference_policy': result['reference_policy'],
         'policies': sorted(result['policies']),
         'selected_pairs': result['policies'][REFERENCE_POLICY]['year_estimates']['selected_pairs'],
         'later_pad_free_records': result['policies'][REFERENCE_POLICY]['year_estimates']['later_pad_free_records'],
         'estimate_table_rows': result['estimate_table']['row_count'],
         'model_fitted': result['model_disposition']['model_fitted'],
+        'max_float_diff': max_float_diff,
         'output_sha256': D.eda.sha(output)}))
 
 

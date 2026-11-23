@@ -35,6 +35,7 @@ Run from manuscript1/:
   "$PY" -B scripts/16_strengthening_analyses.py --verify   # recompute, no write
 """
 
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -50,6 +51,8 @@ from scipy import stats
 
 HERE = Path(__file__).resolve().parents[1]
 EVIDENCE = HERE / 'evidence/STRENGTHENING_ANALYSES.json'
+CLINICAL_EVIDENCE = HERE / 'evidence/CLINICAL_ADJUSTMENT.json'
+ESTIMATES_EVIDENCE = HERE / 'evidence/OBSERVED_STATUS_ESTIMATES.json'
 DRAWS = 2000
 REFERENCE_SEED = 20260907
 CLINICAL_SEED = 20260926
@@ -79,6 +82,9 @@ def load(name, filename):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+cohort_mod = load('cohort', 'cohort.py')
 
 
 def logit(y, X):
@@ -160,11 +166,21 @@ def med_iqr(v):
             'q3': float(np.percentile(v, 75))}
 
 
-def main(argv):
-    verify = '--verify' in argv
+def main(argv=None):
+    ap = argparse.ArgumentParser(description='Post hoc strengthening analyses.')
+    ap.add_argument('--verify', action='store_true')
+    cohort_mod.add_cohort_args(ap)
+    args = ap.parse_args(argv)
+    verify = args.verify
+    cohort_name = args.cohort
+    is_all_ops = cohort_name == cohort_mod.COHORT_ALL_OPERATIONS
+    out_path = cohort_mod.output_path(EVIDENCE, cohort_name)
+    if not verify:
+        cohort_mod.assert_writable_output(out_path)
+
     d = load('drv06', '06_derive_observed_assessments.py')
     E = load('est05', '05_observed_estimators.py')
-    res = d.source_derive()
+    res = d.source_derive(cohort=cohort_name)
     if res['source_verification']['bound_inputs_before'] != 122:
         fail('BOUND_INPUT_COUNT')
     ID = d.ID
@@ -175,11 +191,11 @@ def main(argv):
     wide = pd.read_csv(d.RELEASE / 'tables/patient_wide.csv', dtype=str, keep_default_na=False, usecols=[ID] + fields)
     wide = wide.set_index(wide[ID].astype(str))
     id_set = set(wide.index)
-    clinical_record = json.loads((HERE / 'evidence/CLINICAL_ADJUSTMENT.json').read_text())
+    clinical_record = json.loads(cohort_mod.output_path(CLINICAL_EVIDENCE, cohort_name).read_text())
+    if not is_all_ops and clinical_record.get('cohort', {}).get('cohort_name') != cohort_name:
+        fail('DEPENDENCY_COHORT_MISMATCH', 'clinical adjustment record')
 
     f = res['patients'].copy().reset_index(drop=True)
-    if len(f) != 460:
-        fail('EARLY_USERS', str(len(f)))
     pid = f[ID].astype(str)
     if not pid.isin(id_set).all():
         fail('UNMATCHED_PATIENTS')
@@ -189,9 +205,6 @@ def main(argv):
     y_all = f['_year_status'].eq(1).fillna(False).to_numpy(bool)
     one, two = burden == 'one', burden == 'two_or_more'
     pair = has_year & (one | two)
-    if int(pair.sum()) != 201 or int(y_all[pair & one].sum()) != 58 or int((pair & one).sum()) != 110 \
-            or int(y_all[pair & two].sum()) != 24 or int((pair & two).sum()) != 91:
-        fail('REFERENCE_COUNTS')
 
     def num(col):
         return pd.to_numeric(w[col].str.strip().replace('', np.nan), errors='coerce').to_numpy(float)
@@ -227,7 +240,7 @@ def main(argv):
         'early_day_per30_cent90': (early - 90.0) / 30.0,
         'centre_belchatow': (centre == 'Bełchatów').astype(float),
         'centre_salve': (centre == 'Salve Medica').astype(float),
-        'period_recent': (surgery.dt.year.to_numpy() >= 2025).astype(float),
+        'period_recent': (surgery.dt.year.to_numpy() >= cohort_mod.recent_period_start_year(cohort_name)).astype(float),
         'nerve_sparing_not_performed': (ns == 'not_performed').astype(float),
         'nerve_sparing_not_stated': (~np.isin(ns, ['performed', 'not_performed'])).astype(float),
         'pt3_or_higher': flag(np.nan_to_num(pt) >= 2, pt),
@@ -236,7 +249,10 @@ def main(argv):
     })
 
     # 1. Risk ratio and E-value.
-    x1, n1, x2, n2 = 58, 110, 24, 91
+    x1 = int(y_all[pair & one].sum())
+    n1 = int((pair & one).sum())
+    x2 = int(y_all[pair & two].sum())
+    n2 = int((pair & two).sum())
     rr = (x1 / n1) / (x2 / n2)
     se = math.sqrt(1 / x1 - 1 / n1 + 1 / x2 - 1 / n2)
     rng = np.random.default_rng(REFERENCE_SEED)
@@ -283,15 +299,17 @@ def main(argv):
         return 'two_or_more_unseparated'
 
     levels = np.array([level(p, b) for p, b in zip(f[ID], burden)])
-    transitions = json.loads((HERE / 'evidence/OBSERVED_STATUS_ESTIMATES.json').read_text())['policies']['P0'][
-        'all_paired_transitions_year']['cell_counts']
+    estimates_record = json.loads(cohort_mod.output_path(ESTIMATES_EVIDENCE, cohort_name).read_text())
+    if not is_all_ops and estimates_record.get('cohort', {}).get('cohort_name') != cohort_name:
+        fail('DEPENDENCY_COHORT_MISMATCH', 'observed status estimates record')
+    transitions = estimates_record['policies']['P0']['all_paired_transitions_year']['cell_counts']
     pad_free_early = {'n': int(transitions['early_pad_free|later_pad_free'] + transitions['early_pad_free|later_pad_use']),
                       'events': int(transitions['early_pad_free|later_pad_free'])}
     gradient = {'pad_free_at_three_months': pad_free_early}
     for lv in ('one', 'two', 'three_or_more', 'two_or_more_unseparated'):
         m = levels == lv
         gradient[lv] = {'early_users': int(m.sum()), 'n': int((m & has_year).sum()), 'events': int((m & has_year & y_all).sum())}
-    if gradient['one']['n'] != 110 or sum(gradient[k]['n'] for k in ('two', 'three_or_more', 'two_or_more_unseparated')) != 91:
+    if gradient['one']['n'] != n1 or sum(gradient[k]['n'] for k in ('two', 'three_or_more', 'two_or_more_unseparated')) != n2:
         fail('GRADIENT_CALIBRATION')
 
     def armitage(cells, scores):
@@ -359,8 +377,6 @@ def main(argv):
 
     # 4. Bounds for unclassifiable counts.
     unclass = has_year & np.isin(burden, ['nonconflicting_quantity_uncertain', 'unresolved_quantity_evidence'])
-    if int(unclass.sum()) != 25:
-        fail('UNCLASSIFIED_COUNT', str(int(unclass.sum())))
     bounds = {'unclassified_n': int(unclass.sum()), 'unclassified_pad_free': int(y_all[unclass].sum())}
     for key, target in (('all_assigned_one', 'one'), ('all_assigned_two_or_more', 'two_or_more')):
         rows = [('one' if (b == 'one' or (u and target == 'one')) else 'two_or_more', int(s))
@@ -376,8 +392,6 @@ def main(argv):
 
     # 5. Prognostic value among the complete cases of the clinical model.
     cc = pair & X[CLINICAL].notna().all(axis=1).to_numpy()
-    if int(cc.sum()) != 183:
-        fail('CLINICAL_COMPLETE_CASES', str(int(cc.sum())))
     yc = y_all[cc].astype(float)
     X1 = X.loc[cc, CLINICAL].reset_index(drop=True)
     X1.insert(0, 'intercept', 1.0)
@@ -418,9 +432,6 @@ def main(argv):
 
     # 6. Missing one-year records among closed-window one-pad and two-or-more users.
     cw = closed & (one | two)
-    if int((cw & one).sum()) != 189 or int((cw & two).sum()) != 137 or int((cw & one & has_year).sum()) != 104 \
-            or int((cw & two & has_year).sum()) != 85:
-        fail('CLOSED_WINDOW_CALIBRATION')
     Xa = X.loc[cw, AVAILABILITY].reset_index(drop=True)
     if Xa.isna().any().any():
         fail('AVAILABILITY_COVARIATES_INCOMPLETE')
@@ -525,7 +536,7 @@ def main(argv):
     wide_status = pd.to_numeric(f[ID].map(dict(zip(wide_chosen[ID], wide_chosen._status))), errors='coerce').to_numpy(float)
     wide_obs = ~np.isnan(wide_status) & (one | two)
     widened = contrast(wide_obs, outcome=(wide_status == 1)) | {'window_days': [WIDE_YEAR_WINDOW[0], WIDE_YEAR_WINDOW[1]],
-                                                                'added_men': int(wide_obs.sum()) - 201}
+                                                                'added_men': int(wide_obs.sum()) - int(pair.sum())}
 
     year_chosen = selection['selected']['year']
     ykeys = set(zip(year_chosen[ID], year_chosen._date))
@@ -609,6 +620,29 @@ def main(argv):
                           'bootstrap_upper': float(np.percentile(firth_diffs, 97.5)),
                           'failed_fits': firth_failed, 'seed': FIRTH_SEED}}
 
+    observed_gates = {
+        'early_users': int(len(f)),
+        'classifiable_n': int(pair.sum()),
+        'one_n': n1,
+        'one_events': x1,
+        'two_n': n2,
+        'two_events': x2,
+        'unclassified_n': int(unclass.sum()),
+        'clinical_complete_cases': int(cc.sum()),
+        'closed_window_one_early': int((cw & one).sum()),
+        'closed_window_two_early': int((cw & two).sum()),
+        'closed_window_one_with_year': int((cw & one & has_year).sum()),
+        'closed_window_two_with_year': int((cw & two & has_year).sum()),
+        'availability_weighted_one_pad': float(availability['weighted_one_pad']),
+        'availability_weighted_two_or_more': float(availability['weighted_two_or_more']),
+        'availability_weighted_difference': float(availability['weighted_difference']),
+    }
+    try:
+        cohort_mod.check_or_record_gates(
+            '16_strengthening_analyses', cohort_name, observed_gates, record=args.record_gates)
+    except cohort_mod.GateError as exc:
+        fail(exc.code, exc.detail)
+
     record = {
         'analysis_id': 'M1-STRENGTHENING', 'amendment': 'A-OBS-5', 'status': 'exploratory_post_hoc_disclosed',
         'draws': DRAWS, 'risk_ratio': risk_ratio, 'gradient': gradient, 'country_heterogeneity': heterogeneity,
@@ -616,17 +650,29 @@ def main(argv):
         'epic_agreement': epic, 'outcome_definitions': outcomes, 'clinical_model_checks': clinical,
         'code_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
+    if not is_all_ops:
+        record['cohort'] = res['cohort']
     text = json.dumps(record, indent=2, sort_keys=True, ensure_ascii=False)
     for p in id_set:
         if p and len(p) > 3 and p in text:
             fail('IDENTIFIER_LEAK')
+    max_float_diff = 0.0
     if verify:
-        if json.loads(EVIDENCE.read_text()) != json.loads(text):
+        if not out_path.is_file():
+            fail('SAVED_RECORD_MISMATCH', 'missing_output')
+        saved = out_path.read_text()
+        if is_all_ops:
+            ok, reason, max_float_diff = cohort_mod.compare_records_ignoring_provenance(
+                json.loads(saved), json.loads(text), ignore_keys=('code_sha256',), float_tol=1e-12)
+            if not ok:
+                fail('SAVED_RECORD_MISMATCH', reason)
+        elif json.loads(saved) != json.loads(text):
             fail('SAVED_RECORD_MISMATCH')
-        print(json.dumps({'status': 'saved_strengthening_record_recomputed_exactly'}))
+        print(json.dumps({'status': 'saved_strengthening_record_recomputed_exactly', 'cohort': cohort_name,
+                          'max_float_diff': max_float_diff}))
         return 0
-    EVIDENCE.write_text(text)
-    print(json.dumps({'status': 'written', 'path': str(EVIDENCE)}))
+    out_path.write_text(text)
+    print(json.dumps({'status': 'written', 'cohort': cohort_name, 'path': str(out_path)}))
     return 0
 
 

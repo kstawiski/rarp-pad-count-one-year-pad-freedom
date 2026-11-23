@@ -26,6 +26,7 @@ Run from manuscript1/:
   "$PY" -B scripts/11_selection_followup_sensitivity.py --verify   # recompute, no write
 """
 
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -60,6 +61,9 @@ def load(name, filename):
     return module
 
 
+cohort_mod = load('cohort', 'cohort.py')
+
+
 def med_iqr(values):
     v = pd.to_numeric(pd.Series(values), errors='coerce').dropna().to_numpy(float)
     if not len(v):
@@ -72,18 +76,26 @@ def counts(series):
     return {str(k): int(v) for k, v in pd.Series(series).astype(str).value_counts().sort_index().items()}
 
 
-def main(argv):
-    verify = '--verify' in argv
+def main(argv=None):
+    ap = argparse.ArgumentParser(description='Selection, follow-up-opportunity and missing-outcome sensitivity analyses.')
+    ap.add_argument('--verify', action='store_true')
+    cohort_mod.add_cohort_args(ap)
+    args = ap.parse_args(argv)
+    verify = args.verify
+    cohort_name = args.cohort
+    is_all_ops = cohort_name == cohort_mod.COHORT_ALL_OPERATIONS
+    out_path = cohort_mod.output_path(EVIDENCE, cohort_name)
+    if not verify:
+        cohort_mod.assert_writable_output(out_path)
+
     d = load('drv06', '06_derive_observed_assessments.py')
     E = load('est05', '05_observed_estimators.py')
-    res = d.source_derive()
+    res = d.source_derive(cohort=cohort_name, include_all_operations=not is_all_ops)
     if res['source_verification']['bound_inputs_before'] != 122:
         fail('BOUND_INPUT_COUNT')
     ID = d.ID
     sets, frame, selection, candidate = res['sets'], res['patients'], res['selection'], res['candidate']
     robotic = set(res['robotic'])
-    if len(frame) != 460 or len(robotic) != 1397:
-        fail('LADDER', f'{len(frame)} {len(robotic)}')
 
     wide = pd.read_csv(d.RELEASE / 'tables/patient_wide.csv', dtype=str, keep_default_na=False,
                        usecols=[ID, 'operation_centre', 'surgery_date', 'age', 'country',
@@ -110,8 +122,8 @@ def main(argv):
     f['_platform_flag'] = f['_pid'].map(wide['platform_conflict']).astype(str).str.strip().isin(['1', 'True', 'true', '1.0'])
     f['_epic'] = f['_pid'].map(wide['pad_count_instrument_src']).astype(str).str.strip().eq('EPIC')
 
-    def contrast(mask, label):
-        sub = f.loc[mask & f['_has_year']]
+    def contrast_on(df, mask, label):
+        sub = df.loc[mask & df['_has_year']]
         rows = [(str(b), int(s)) for b, s in zip(sub['_burden'], sub['_year_status'].astype(int))]
         boot = E.proportion_difference(rows, 'one', 'two_or_more', method=E.METHOD_BOOTSTRAP,
                                        confidence=0.95, resamples=DRAWS, seed=REFERENCE_SEED)
@@ -127,12 +139,11 @@ def main(argv):
                 'one_wilson': [boot['group_a']['lower'], boot['group_a']['upper']],
                 'two_wilson': [boot['group_b']['lower'], boot['group_b']['upper']]}
 
+    def contrast(mask, label):
+        return contrast_on(f, mask, label)
+
     everyone = pd.Series(True, index=f.index)
     ref = contrast(everyone, 'reference')
-    if not (ref['pairs'] == 226 and ref['one_n'] == 110 and ref['two_n'] == 91 and ref['one_events'] == 58
-            and ref['two_events'] == 24 and abs(ref['bootstrap_lower'] - 0.1327) < 5e-4
-            and abs(ref['bootstrap_upper'] - 0.3951) < 5e-4 and abs(ref['newcombe_lower'] - 0.1281) < 5e-4):
-        fail('REFERENCE_CALIBRATION', json.dumps(ref))
 
     # Exact-count classification, copied from script 10 so the restriction can be recomputed
     # with the reference resampling scheme.
@@ -170,25 +181,38 @@ def main(argv):
         exact[pid] = ok
     f['_exact'] = f[ID].map(exact).fillna(False).astype(bool)
     range_reliant = f['_has_year'] & f['_burden'].eq('two_or_more') & ~f['_exact']
-    if int(range_reliant.sum()) != 23 or int((f['_has_year'] & f['_burden'].eq('one') & ~f['_exact']).sum()) != 0:
-        fail('EXACT_COUNT_CALIBRATION', str(int(range_reliant.sum())))
+    range_reliant_one = f['_has_year'] & f['_burden'].eq('one') & ~f['_exact']
 
     device = f['_flag_device_evidence_present_never_used_as_ordinary'].astype(bool)
 
-    contrasts = {
-        'reference': ref,
-        'window_closed_before_common_extract': contrast(f['_closed_common'], 'window_closed_before_2026_04_01'),
-        'window_closed_before_centre_extract': contrast(f['_closed_centre'], 'window_closed_before_centre_lead'),
-        'operative_era_2017_2024': contrast(f['_era_2017_2024'], 'operated_2017_2024'),
-        'exact_count_records': contrast(~range_reliant, 'exclude_range_reliant_two_or_more'),
-        'epic_instrument_excluded': contrast(~f['_epic'], 'exclude_epic_instrument'),
-        'device_evidence_excluded': contrast(~device, 'exclude_other_absorbent_product_on_early_day'),
-        'platform_flag_excluded': contrast(~f['_platform_flag'], 'exclude_platform_provenance_flag'),
-    }
-    for key in ('poland', 'united_states'):
-        country = 'Poland' if key == 'poland' else 'United States'
-        contrasts['window_closed_' + key] = contrast(f['_closed_common'] & f['_country'].eq(country),
-                                                     'window_closed_' + key)
+    if is_all_ops:
+        contrasts = {
+            'reference': ref,
+            'window_closed_before_common_extract': contrast(f['_closed_common'], 'window_closed_before_2026_04_01'),
+            'window_closed_before_centre_extract': contrast(f['_closed_centre'], 'window_closed_before_centre_lead'),
+            'operative_era_2017_2024': contrast(f['_era_2017_2024'], 'operated_2017_2024'),
+            'exact_count_records': contrast(~range_reliant, 'exclude_range_reliant_two_or_more'),
+            'epic_instrument_excluded': contrast(~f['_epic'], 'exclude_epic_instrument'),
+            'device_evidence_excluded': contrast(~device, 'exclude_other_absorbent_product_on_early_day'),
+            'platform_flag_excluded': contrast(~f['_platform_flag'], 'exclude_platform_provenance_flag'),
+        }
+        for key in ('poland', 'united_states'):
+            country = 'Poland' if key == 'poland' else 'United States'
+            contrasts['window_closed_' + key] = contrast(f['_closed_common'] & f['_country'].eq(country),
+                                                         'window_closed_' + key)
+    else:
+        f_all = res['all_operations_patients'].copy()
+        f_all['_has_year'] = f_all['_year_status'].notna()
+        f_all['_burden'] = f_all['_burden'].astype(str)
+        contrasts = {
+            'reference': ref,
+            'including_later_operations': contrast_on(f_all, pd.Series(True, index=f_all.index), 'including_later_operations'),
+            'operative_era_2017_2024': contrast(f['_era_2017_2024'], 'operated_2017_2024'),
+            'exact_count_records': contrast(~range_reliant, 'exclude_range_reliant_two_or_more'),
+            'epic_instrument_excluded': contrast(~f['_epic'], 'exclude_epic_instrument'),
+            'device_evidence_excluded': contrast(~device, 'exclude_other_absorbent_product_on_early_day'),
+            'platform_flag_excluded': contrast(~f['_platform_flag'], 'exclude_platform_provenance_flag'),
+        }
 
     # Availability among early pad users.
     def availability(mask):
@@ -229,16 +253,18 @@ def main(argv):
     with_year = describe(f.loc[f['_has_year']])
     without_year = describe(f.loc[~f['_has_year']])
 
-    # Availability model among the 412 one-pad and two-or-more early users (descriptive).
+    # Availability model among the one-pad and two-or-more early users (descriptive).
     import statsmodels.api as sm
     av = f.loc[f['_burden'].isin(['one', 'two_or_more'])].copy()
-    Xa = pd.DataFrame({'intercept': 1.0,
-                       'two_or_more': av['_burden'].eq('two_or_more').astype(float),
-                       'age_per10_cent65': (pd.to_numeric(av['_age'], errors='coerce') - 65.0) / 10.0,
-                       'early_day_per30_cent90': (pd.to_numeric(av['_early_day'], errors='coerce') - 90.0) / 30.0,
-                       'centre_belchatow': av['_centre'].eq('Bełchatów').astype(float),
-                       'centre_salve': av['_centre'].eq('Salve Medica').astype(float),
-                       'window_open_at_extract': (~av['_closed_common']).astype(float)})
+    av_cols = {'intercept': 1.0,
+               'two_or_more': av['_burden'].eq('two_or_more').astype(float),
+               'age_per10_cent65': (pd.to_numeric(av['_age'], errors='coerce') - 65.0) / 10.0,
+               'early_day_per30_cent90': (pd.to_numeric(av['_early_day'], errors='coerce') - 90.0) / 30.0,
+               'centre_belchatow': av['_centre'].eq('Bełchatów').astype(float),
+               'centre_salve': av['_centre'].eq('Salve Medica').astype(float)}
+    if is_all_ops:
+        av_cols['window_open_at_extract'] = (~av['_closed_common']).astype(float)
+    Xa = pd.DataFrame(av_cols)
     if not np.isfinite(Xa.to_numpy(float)).all():
         fail('AVAILABILITY_COVARIATES')
     fa = sm.Logit(av['_has_year'].astype(float).to_numpy(), Xa).fit(disp=False, maxiter=200)
@@ -270,8 +296,6 @@ def main(argv):
 
     robotic_with_early = describe_robotic(rob.loc[rob['_early']])
     robotic_without_early = describe_robotic(rob.loc[~rob['_early']])
-    if robotic_with_early['n'] != 644 or robotic_without_early['n'] != 753:
-        fail('ROBOTIC_EARLY_SPLIT', f"{robotic_with_early['n']} {robotic_without_early['n']}")
 
     # Source-level month ranges.
     def month_range(series):
@@ -336,17 +360,45 @@ def main(argv):
                 'grid_step': 0.05, 'grid_q': grid_q, 'grid_difference_rows_q1_cols_q2': grid,
                 'share_of_unit_square_with_positive_difference_step_0_01': positive_share}
 
-    missing = {'all_early_users': missing_outcome(everyone, 'all_one_and_two_or_more_early_users'),
-               'window_closed_before_common_extract': missing_outcome(f['_closed_common'], 'window_closed')}
+    if is_all_ops:
+        missing = {'all_early_users': missing_outcome(everyone, 'all_one_and_two_or_more_early_users'),
+                   'window_closed_before_common_extract': missing_outcome(f['_closed_common'], 'window_closed')}
+    else:
+        missing = {'all_early_users': missing_outcome(everyone, 'completed_window_one_and_two_or_more_early_users')}
     rv = missing['all_early_users']
-    if not (abs(rv['lower_bound'] + 0.376) < 5e-3 and abs(rv['upper_bound'] - 0.643) < 5e-3):
-        fail('REVIEWER_BOUNDS_ARITHMETIC', f"{rv['lower_bound']} {rv['upper_bound']}")
 
-    # Post hoc country model without the one-year assessment day (201 classifiable pairs).
+    # Post hoc country model without the one-year assessment day (classifiable pairs).
     sub = f.loc[f['_has_year'] & f['_burden'].isin(['one', 'two_or_more'])].reset_index(drop=True)
     y = sub['_year_status'].eq(1).astype(float).to_numpy()
-    if len(sub) != 201 or int(y.sum()) != 82:
-        fail('CLASSIFIABLE_SET')
+    observed_gates = {
+        'early_users': int(len(frame)),
+        'robotic': int(len(robotic)),
+        'reference_pairs': int(ref['pairs']),
+        'reference_one_n': int(ref['one_n']),
+        'reference_two_n': int(ref['two_n']),
+        'reference_one_events': int(ref['one_events']),
+        'reference_two_events': int(ref['two_events']),
+        'reference_difference': float(ref['difference']),
+        'reference_bootstrap_lower': float(ref['bootstrap_lower']),
+        'reference_bootstrap_upper': float(ref['bootstrap_upper']),
+        'reference_newcombe_lower': float(ref['newcombe_lower']),
+        'range_reliant_two_or_more': int(range_reliant.sum()),
+        'range_reliant_one': int(range_reliant_one.sum()),
+        'robotic_with_early': int(robotic_with_early['n']),
+        'robotic_without_early': int(robotic_without_early['n']),
+        'missing_outcome_lower_bound': float(rv['lower_bound']),
+        'missing_outcome_upper_bound': float(rv['upper_bound']),
+        'symmetric_shift_tipping_delta': (
+            None if rv['symmetric_shift_tipping_delta'] is None else float(rv['symmetric_shift_tipping_delta'])
+        ),
+        'classifiable_n': int(len(sub)),
+        'classifiable_events': int(y.sum()),
+    }
+    try:
+        cohort_mod.check_or_record_gates(
+            '11_selection_followup_sensitivity', cohort_name, observed_gates, record=args.record_gates)
+    except cohort_mod.GateError as exc:
+        fail(exc.code, exc.detail)
 
     def fit_variant(cols, seed):
         X = pd.DataFrame({'intercept': np.ones(len(sub))})
@@ -391,18 +443,28 @@ def main(argv):
             'country_us': sub['_country'].eq('United States').astype(float).to_numpy()}
     country_no_yearday = fit_variant(base, MODEL_SEED)
 
+    if is_all_ops:
+        availability_block = {
+            'all_early_users': availability(everyone),
+            'window_closed_before_common_extract': availability(f['_closed_common']),
+            'window_open_at_common_extract': availability(~f['_closed_common']),
+            'with_year_record': with_year, 'without_year_record': without_year,
+            'model_one_vs_two_or_more': availability_model,
+        }
+    else:
+        availability_block = {
+            'all_early_users': availability(everyone),
+            'with_year_record': with_year, 'without_year_record': without_year,
+            'model_one_vs_two_or_more': availability_model,
+        }
+
     record = {
         'analysis_id': 'M1-SELECTION', 'amendment': 'A-OBS-3', 'status': 'exploratory_post_hoc_disclosed',
         'draws': DRAWS, 'reference_seed': REFERENCE_SEED, 'model_seed': MODEL_SEED,
         'extract_date_leads': EXTRACT_LEADS, 'common_extract_date': COMMON_EXTRACT.strftime('%Y-%m-%d'),
         'year_window_close_day': YEAR_WINDOW_CLOSE,
-        'window_closed_early_users': {'common': int(f['_closed_common'].sum()), 'centre': int(f['_closed_centre'].sum())},
         'contrasts': contrasts,
-        'availability': {'all_early_users': availability(everyone),
-                         'window_closed_before_common_extract': availability(f['_closed_common']),
-                         'window_open_at_common_extract': availability(~f['_closed_common']),
-                         'with_year_record': with_year, 'without_year_record': without_year,
-                         'model_one_vs_two_or_more': availability_model},
+        'availability': availability_block,
         'robotic_early_assessment': {'with_early_assessment': robotic_with_early,
                                      'without_early_assessment': robotic_without_early},
         'source_month_ranges': source_ranges,
@@ -416,17 +478,32 @@ def main(argv):
             'range_reliant_two_or_more': int(range_reliant.sum())},
         'code_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
+    if is_all_ops:
+        record['window_closed_early_users'] = {
+            'common': int(f['_closed_common'].sum()), 'centre': int(f['_closed_centre'].sum())}
+    else:
+        record['cohort'] = res['cohort']
     text = json.dumps(record, indent=2, sort_keys=True, ensure_ascii=False)
     for pid in id_set:
         if pid and len(pid) > 3 and pid in text:
             fail('IDENTIFIER_LEAK')
+    max_float_diff = 0.0
     if verify:
-        if json.loads(EVIDENCE.read_text()) != json.loads(text):
+        if not out_path.is_file():
+            fail('SAVED_RECORD_MISMATCH', 'missing_output')
+        saved = out_path.read_text()
+        if is_all_ops:
+            ok, reason, max_float_diff = cohort_mod.compare_records_ignoring_provenance(
+                json.loads(saved), json.loads(text), ignore_keys=('code_sha256',), float_tol=1e-12)
+            if not ok:
+                fail('SAVED_RECORD_MISMATCH', reason)
+        elif json.loads(saved) != json.loads(text):
             fail('SAVED_RECORD_MISMATCH')
-        print(json.dumps({'status': 'saved_selection_record_recomputed_exactly'}))
+        print(json.dumps({'status': 'saved_selection_record_recomputed_exactly', 'cohort': cohort_name,
+                          'max_float_diff': max_float_diff}))
         return 0
-    EVIDENCE.write_text(text)
-    print(json.dumps({'status': 'written', 'path': str(EVIDENCE)}))
+    out_path.write_text(text)
+    print(json.dumps({'status': 'written', 'cohort': cohort_name, 'path': str(out_path)}))
     return 0
 
 

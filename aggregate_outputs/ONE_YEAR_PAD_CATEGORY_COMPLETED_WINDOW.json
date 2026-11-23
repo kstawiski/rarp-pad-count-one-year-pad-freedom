@@ -1,0 +1,1075 @@
+{
+  "analysis_id": "M1-ONE-YEAR-PAD-CATEGORY",
+  "classification_rule_audit": {
+    "classify_day_06_counts": {
+      "not_classifiable": 21,
+      "one": 98,
+      "two_or_more": 20
+    },
+    "disagreement_causes_vs_06": {
+      "at_most_one_not_exact_one": 2,
+      "crossing_range_evidence": 5,
+      "incompatible_valid_intervals": 3,
+      "invalid_quantity_evidence": 0,
+      "partial_bound_evidence": 0
+    },
+    "disagreements_script16_vs_06": 10,
+    "disagreements_script16_vs_parenthetical": 6,
+    "paired_year_pad_users_audited": 139,
+    "parenthetical_strict_counts": {
+      "not_classifiable": 17,
+      "one": 102,
+      "two_or_more": 20
+    },
+    "rule_used": "script_16_social_continence_quantity_rule",
+    "script16_counts": {
+      "not_classifiable": 11,
+      "one": 102,
+      "two_or_more": 26
+    },
+    "strict_rule_by_three_month_level": {
+      "one": {
+        "classified": 101,
+        "not_classifiable": 3,
+        "one": 45,
+        "pad_free": 54,
+        "two_or_more": 2,
+        "with_year_record": 104
+      },
+      "three_or_more": {
+        "classified": 36,
+        "not_classifiable": 2,
+        "one": 16,
+        "pad_free": 8,
+        "two_or_more": 12,
+        "with_year_record": 38
+      },
+      "two": {
+        "classified": 34,
+        "not_classifiable": 2,
+        "one": 17,
+        "pad_free": 15,
+        "two_or_more": 2,
+        "with_year_record": 36
+      },
+      "two_or_more_all": {
+        "classified": 80,
+        "not_classifiable": 5,
+        "one": 42,
+        "pad_free": 24,
+        "two_or_more": 14,
+        "with_year_record": 85
+      }
+    }
+  },
+  "code_sha256": "9f1f759905bdeb551a237ed7ecff298ae1a52d01ded8bebd2e004a209687efc0",
+  "cohort": {
+    "cohort_name": "completed_window",
+    "common_extract_date": "2026-04-01",
+    "eligible_robotic_patients": 1022,
+    "excluded_robotic_patients": 375,
+    "model_recent_period_start_year": 2024,
+    "robotic_patients_total": 1397,
+    "rule_name": "operation_date_plus_425_days_before_2026_04_01",
+    "unusable_operation_date_all_released_patients": 0,
+    "unusable_operation_date_robotic_patients": 0,
+    "year_window_close_day": 425
+  },
+  "confidence": 0.95,
+  "draws": 2000,
+  "one_year_classification_rule": {
+    "column_order_table_a": [
+      "pad_free",
+      "one",
+      "two_or_more",
+      "not_classifiable"
+    ],
+    "description": "Reuses script 16 social-continence rule on status-consistent candidate rows of the selected one-year day: _year_status == 1 -> pad_free; otherwise from upper bounds of informative valid rows (`_ok & upper.notna()`): empty -> not_classifiable; all <= 1 -> one (at most one pad); otherwise -> two_or_more.",
+    "row_order_table_a": [
+      "pad_free_at_three_months",
+      "one",
+      "two",
+      "three_or_more",
+      "two_or_more_unseparated",
+      "nonconflicting_quantity_uncertain",
+      "unresolved_quantity_evidence",
+      "two_or_more_all",
+      "all_pad_users"
+    ],
+    "row_order_table_c": [
+      "pad_free_at_three_months",
+      "one",
+      "two_or_more_all"
+    ]
+  },
+  "phase1_reconciliation": {
+    "early_users_per_level": {
+      "all_pad_users": {
+        "early_users": 364,
+        "with_year_record": 213,
+        "year_pad_free": 82
+      },
+      "nonconflicting_quantity_uncertain": {
+        "early_users": 34,
+        "with_year_record": 22,
+        "year_pad_free": 4
+      },
+      "one": {
+        "early_users": 189,
+        "with_year_record": 104,
+        "year_pad_free": 54
+      },
+      "three_or_more": {
+        "early_users": 65,
+        "with_year_record": 38,
+        "year_pad_free": 8
+      },
+      "two": {
+        "early_users": 56,
+        "with_year_record": 36,
+        "year_pad_free": 15
+      },
+      "two_or_more_all": {
+        "early_users": 137,
+        "with_year_record": 85,
+        "year_pad_free": 24
+      },
+      "two_or_more_unseparated": {
+        "early_users": 16,
+        "with_year_record": 11,
+        "year_pad_free": 1
+      },
+      "unresolved_quantity_evidence": {
+        "early_users": 4,
+        "with_year_record": 2,
+        "year_pad_free": 0
+      }
+    },
+    "gate_checks": {
+      "all_gates_matched": true,
+      "checks_passed": 43,
+      "early_users_total_06": 364,
+      "social_continence_excluded": 3,
+      "social_continence_one_events": 99,
+      "social_continence_one_n": 102,
+      "social_continence_two_events": 66,
+      "social_continence_two_n": 84
+    }
+  },
+  "seed": 20261121,
+  "software": {
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "python": "3.14.10",
+    "scipy": "1.18.1"
+  },
+  "status": "exploratory_post_hoc_disclosed",
+  "table_a_three_month_by_one_year": {
+    "all_pad_users": {
+      "N": 213,
+      "columns": {
+        "not_classifiable": {
+          "N": 213,
+          "estimable": true,
+          "lower": 0.019152270212671903,
+          "n": 8,
+          "not_estimable_reason": null,
+          "proportion": 0.03755868544600939,
+          "upper": 0.07234987577270904
+        },
+        "one": {
+          "N": 213,
+          "estimable": true,
+          "lower": 0.39445955888410156,
+          "n": 98,
+          "not_estimable_reason": null,
+          "proportion": 0.460093896713615,
+          "upper": 0.5271421491450937
+        },
+        "pad_free": {
+          "N": 213,
+          "estimable": true,
+          "lower": 0.32221724795717543,
+          "n": 82,
+          "not_estimable_reason": null,
+          "proportion": 0.38497652582159625,
+          "upper": 0.45181120459756396
+        },
+        "two_or_more": {
+          "N": 213,
+          "estimable": true,
+          "lower": 0.08077672149795292,
+          "n": 25,
+          "not_estimable_reason": null,
+          "proportion": 0.11737089201877934,
+          "upper": 0.1675220084290374
+        }
+      },
+      "label": "All men using pads at three months"
+    },
+    "nonconflicting_quantity_uncertain": {
+      "N": 22,
+      "columns": {
+        "not_classifiable": {
+          "N": 22,
+          "estimable": true,
+          "lower": 0.10123039985248514,
+          "n": 5,
+          "not_estimable_reason": null,
+          "proportion": 0.22727272727272727,
+          "upper": 0.4343995317522171
+        },
+        "one": {
+          "N": 22,
+          "estimable": true,
+          "lower": 0.30722106273725025,
+          "n": 11,
+          "not_estimable_reason": null,
+          "proportion": 0.5,
+          "upper": 0.6927789372627497
+        },
+        "pad_free": {
+          "N": 22,
+          "estimable": true,
+          "lower": 0.07306884583422057,
+          "n": 4,
+          "not_estimable_reason": null,
+          "proportion": 0.18181818181818182,
+          "upper": 0.38516607437126543
+        },
+        "two_or_more": {
+          "N": 22,
+          "estimable": true,
+          "lower": 0.025295428990995295,
+          "n": 2,
+          "not_estimable_reason": null,
+          "proportion": 0.09090909090909091,
+          "upper": 0.27814946841605814
+        }
+      },
+      "label": "Unclear count (nonconflicting quantity uncertain)"
+    },
+    "one": {
+      "N": 104,
+      "columns": {
+        "not_classifiable": {
+          "N": 104,
+          "estimable": true,
+          "lower": 0.005289711585064017,
+          "n": 2,
+          "not_estimable_reason": null,
+          "proportion": 0.019230769230769232,
+          "upper": 0.0674231291576782
+        },
+        "one": {
+          "N": 104,
+          "estimable": true,
+          "lower": 0.34155001052393,
+          "n": 45,
+          "not_estimable_reason": null,
+          "proportion": 0.4326923076923077,
+          "upper": 0.5286297871800539
+        },
+        "pad_free": {
+          "N": 104,
+          "estimable": true,
+          "lower": 0.4242449782041775,
+          "n": 54,
+          "not_estimable_reason": null,
+          "proportion": 0.5192307692307693,
+          "upper": 0.6128465081661127
+        },
+        "two_or_more": {
+          "N": 104,
+          "estimable": true,
+          "lower": 0.009858182902777006,
+          "n": 3,
+          "not_estimable_reason": null,
+          "proportion": 0.028846153846153848,
+          "upper": 0.08140040102511037
+        }
+      },
+      "label": "Exactly one pad per day"
+    },
+    "pad_free_at_three_months": {
+      "N": 80,
+      "columns": {
+        "not_classifiable": {
+          "N": 80,
+          "estimable": true,
+          "lower": 0.012834568919911415,
+          "n": 3,
+          "not_estimable_reason": null,
+          "proportion": 0.0375,
+          "upper": 0.10454720090045115
+        },
+        "one": {
+          "N": 80,
+          "estimable": true,
+          "lower": 0.019613554535544288,
+          "n": 4,
+          "not_estimable_reason": null,
+          "proportion": 0.05,
+          "upper": 0.1216227620464301
+        },
+        "pad_free": {
+          "N": 80,
+          "estimable": true,
+          "lower": 0.8148931119389591,
+          "n": 72,
+          "not_estimable_reason": null,
+          "proportion": 0.9,
+          "upper": 0.9484523844326191
+        },
+        "two_or_more": {
+          "N": 80,
+          "estimable": true,
+          "lower": 0.0022099755204522745,
+          "n": 1,
+          "not_estimable_reason": null,
+          "proportion": 0.0125,
+          "upper": 0.06746270077668665
+        }
+      },
+      "label": "Pad-free at three months"
+    },
+    "three_or_more": {
+      "N": 38,
+      "columns": {
+        "not_classifiable": {
+          "N": 38,
+          "estimable": true,
+          "lower": 0.004660587685768783,
+          "n": 1,
+          "not_estimable_reason": null,
+          "proportion": 0.02631578947368421,
+          "upper": 0.13494876115952126
+        },
+        "one": {
+          "N": 38,
+          "estimable": true,
+          "lower": 0.27852501157758713,
+          "n": 16,
+          "not_estimable_reason": null,
+          "proportion": 0.42105263157894735,
+          "upper": 0.5780765465632945
+        },
+        "pad_free": {
+          "N": 38,
+          "estimable": true,
+          "lower": 0.11074791842995882,
+          "n": 8,
+          "not_estimable_reason": null,
+          "proportion": 0.21052631578947367,
+          "upper": 0.363457794753274
+        },
+        "two_or_more": {
+          "N": 38,
+          "estimable": true,
+          "lower": 0.21212415179959423,
+          "n": 13,
+          "not_estimable_reason": null,
+          "proportion": 0.34210526315789475,
+          "upper": 0.5010789644821693
+        }
+      },
+      "label": "Three or more pads per day"
+    },
+    "two": {
+      "N": 36,
+      "columns": {
+        "not_classifiable": {
+          "N": 36,
+          "estimable": true,
+          "lower": 0.0,
+          "n": 0,
+          "not_estimable_reason": null,
+          "proportion": 0.0,
+          "upper": 0.09641862859446365
+        },
+        "one": {
+          "N": 36,
+          "estimable": true,
+          "lower": 0.3198604151517906,
+          "n": 17,
+          "not_estimable_reason": null,
+          "proportion": 0.4722222222222222,
+          "upper": 0.629940619770124
+        },
+        "pad_free": {
+          "N": 36,
+          "estimable": true,
+          "lower": 0.2714056205144606,
+          "n": 15,
+          "not_estimable_reason": null,
+          "proportion": 0.4166666666666667,
+          "upper": 0.5779974842512833
+        },
+        "two_or_more": {
+          "N": 36,
+          "estimable": true,
+          "lower": 0.04406640300315651,
+          "n": 4,
+          "not_estimable_reason": null,
+          "proportion": 0.1111111111111111,
+          "upper": 0.2531480859036486
+        }
+      },
+      "label": "Exactly two pads per day"
+    },
+    "two_or_more_all": {
+      "N": 85,
+      "columns": {
+        "not_classifiable": {
+          "N": 85,
+          "estimable": true,
+          "lower": 0.002079787134664099,
+          "n": 1,
+          "not_estimable_reason": null,
+          "proportion": 0.011764705882352941,
+          "upper": 0.06367170882493911
+        },
+        "one": {
+          "N": 85,
+          "estimable": true,
+          "lower": 0.3904083520127139,
+          "n": 42,
+          "not_estimable_reason": null,
+          "proportion": 0.49411764705882355,
+          "upper": 0.5983356419145103
+        },
+        "pad_free": {
+          "N": 85,
+          "estimable": true,
+          "lower": 0.19768853463487676,
+          "n": 24,
+          "not_estimable_reason": null,
+          "proportion": 0.2823529411764706,
+          "upper": 0.38583924067241615
+        },
+        "two_or_more": {
+          "N": 85,
+          "estimable": true,
+          "lower": 0.13836235998806562,
+          "n": 18,
+          "not_estimable_reason": null,
+          "proportion": 0.21176470588235294,
+          "upper": 0.31009334244591696
+        }
+      },
+      "label": "Two or more pads, all"
+    },
+    "two_or_more_unseparated": {
+      "N": 11,
+      "columns": {
+        "not_classifiable": {
+          "N": 11,
+          "estimable": true,
+          "lower": 0.0,
+          "n": 0,
+          "not_estimable_reason": null,
+          "proportion": 0.0,
+          "upper": 0.25883296696803165
+        },
+        "one": {
+          "N": 11,
+          "estimable": true,
+          "lower": 0.5230194380391558,
+          "n": 9,
+          "not_estimable_reason": null,
+          "proportion": 0.8181818181818182,
+          "upper": 0.9486323102539148
+        },
+        "pad_free": {
+          "N": 11,
+          "estimable": true,
+          "lower": 0.016232172885884855,
+          "n": 1,
+          "not_estimable_reason": null,
+          "proportion": 0.09090909090909091,
+          "upper": 0.37735843645159556
+        },
+        "two_or_more": {
+          "N": 11,
+          "estimable": true,
+          "lower": 0.016232172885884855,
+          "n": 1,
+          "not_estimable_reason": null,
+          "proportion": 0.09090909090909091,
+          "upper": 0.37735843645159556
+        }
+      },
+      "label": "Two or more pads, not separable into two vs three or more"
+    },
+    "unresolved_quantity_evidence": {
+      "N": 2,
+      "columns": {
+        "not_classifiable": {
+          "N": 2,
+          "estimable": true,
+          "lower": 0.0,
+          "n": 0,
+          "not_estimable_reason": null,
+          "proportion": 0.0,
+          "upper": 0.6576197724933468
+        },
+        "one": {
+          "N": 2,
+          "estimable": true,
+          "lower": 0.0,
+          "n": 0,
+          "not_estimable_reason": null,
+          "proportion": 0.0,
+          "upper": 0.6576197724933468
+        },
+        "pad_free": {
+          "N": 2,
+          "estimable": true,
+          "lower": 0.0,
+          "n": 0,
+          "not_estimable_reason": null,
+          "proportion": 0.0,
+          "upper": 0.6576197724933468
+        },
+        "two_or_more": {
+          "N": 2,
+          "estimable": true,
+          "lower": 0.3423802275066532,
+          "n": 2,
+          "not_estimable_reason": null,
+          "proportion": 1.0,
+          "upper": 1.0
+        }
+      },
+      "label": "Conflicting count (unresolved quantity evidence)"
+    }
+  },
+  "table_b_still_using_two_or_more_at_one_year": {
+    "contrasts": {
+      "three_or_more_minus_one": {
+        "bootstrap": {
+          "invalid_reasons": {},
+          "max_invalid_fraction": 0.05,
+          "observed_invalid_fraction": 0.0,
+          "percentiles": [
+            2.5,
+            97.5
+          ],
+          "quantile_rule": "numpy_percentile_linear_interpolation_on_successful_replicates",
+          "resamples_invalid": 0,
+          "resamples_requested": 2000,
+          "resamples_successful": 2000,
+          "resampling_population": "all_canonical_rows_including_unknown_category; with_replacement; size_equals_rows_total",
+          "resampling_unit": "whole_patient_tuple_category_and_outcome_together",
+          "seed": 20261121
+        },
+        "bootstrap_lower": 0.1635604278777807,
+        "bootstrap_upper": 0.4859460273032003,
+        "contrast": "three_or_more_minus_one",
+        "estimable": true,
+        "estimate": 0.321939586645469,
+        "group_a": {
+          "confidence": 0.95,
+          "denominator": 37,
+          "estimable": true,
+          "estimate": 0.35135135135135137,
+          "lower": 0.21825607133927133,
+          "method": "wilson_score_two_sided",
+          "not_estimable_reason": null,
+          "numerator": 13,
+          "uncertainty_scope": "conditional_sampling_uncertainty_only; independent_patient_rows; not_measurement_error; not_record_ambiguity; not_source_system_selection",
+          "upper": 0.5124097687744917
+        },
+        "group_a_label": "three_or_more",
+        "group_b": {
+          "confidence": 0.95,
+          "denominator": 102,
+          "estimable": true,
+          "estimate": 0.029411764705882353,
+          "lower": 0.0100524482029039,
+          "method": "wilson_score_two_sided",
+          "not_estimable_reason": null,
+          "numerator": 3,
+          "uncertainty_scope": "conditional_sampling_uncertainty_only; independent_patient_rows; not_measurement_error; not_record_ambiguity; not_source_system_selection",
+          "upper": 0.08293057499376733
+        },
+        "group_b_label": "one",
+        "newcombe_lower": 0.1784870975902957,
+        "newcombe_upper": 0.48415733215535156,
+        "not_estimable_reason": null
+      },
+      "two_or_more_all_minus_one": {
+        "bootstrap": {
+          "invalid_reasons": {},
+          "max_invalid_fraction": 0.05,
+          "observed_invalid_fraction": 0.0,
+          "percentiles": [
+            2.5,
+            97.5
+          ],
+          "quantile_rule": "numpy_percentile_linear_interpolation_on_successful_replicates",
+          "resamples_invalid": 0,
+          "resamples_requested": 2000,
+          "resamples_successful": 2000,
+          "resampling_population": "all_canonical_rows_including_unknown_category; with_replacement; size_equals_rows_total",
+          "resampling_unit": "whole_patient_tuple_category_and_outcome_together",
+          "seed": 20261121
+        },
+        "bootstrap_lower": 0.09453971441659344,
+        "bootstrap_upper": 0.28330740923990344,
+        "contrast": "two_or_more_minus_one",
+        "estimable": true,
+        "estimate": 0.18487394957983191,
+        "group_a": {
+          "confidence": 0.95,
+          "denominator": 84,
+          "estimable": true,
+          "estimate": 0.21428571428571427,
+          "lower": 0.1400676654499156,
+          "method": "wilson_score_two_sided",
+          "not_estimable_reason": null,
+          "numerator": 18,
+          "uncertainty_scope": "conditional_sampling_uncertainty_only; independent_patient_rows; not_measurement_error; not_record_ambiguity; not_source_system_selection",
+          "upper": 0.3134933222156043
+        },
+        "group_a_label": "two_or_more",
+        "group_b": {
+          "confidence": 0.95,
+          "denominator": 102,
+          "estimable": true,
+          "estimate": 0.029411764705882353,
+          "lower": 0.0100524482029039,
+          "method": "wilson_score_two_sided",
+          "not_estimable_reason": null,
+          "numerator": 3,
+          "uncertainty_scope": "conditional_sampling_uncertainty_only; independent_patient_rows; not_measurement_error; not_record_ambiguity; not_source_system_selection",
+          "upper": 0.08293057499376733
+        },
+        "group_b_label": "one",
+        "newcombe_lower": 0.09337213633209557,
+        "newcombe_upper": 0.28595279309633276,
+        "not_estimable_reason": null
+      }
+    },
+    "denominator_definition": "Men with a selected one-year record and a classifiable one-year pad category (pad_free, one, or two_or_more).",
+    "rows": {
+      "one": {
+        "N": 102,
+        "estimable": true,
+        "lower": 0.0100524482029039,
+        "n": 3,
+        "not_classifiable": 2,
+        "not_estimable_reason": null,
+        "proportion": 0.029411764705882353,
+        "total_with_year_record": 104,
+        "upper": 0.08293057499376733
+      },
+      "three_or_more": {
+        "N": 37,
+        "estimable": true,
+        "lower": 0.21825607133927133,
+        "n": 13,
+        "not_classifiable": 1,
+        "not_estimable_reason": null,
+        "proportion": 0.35135135135135137,
+        "total_with_year_record": 38,
+        "upper": 0.5124097687744917
+      },
+      "two": {
+        "N": 36,
+        "estimable": true,
+        "lower": 0.04406640300315651,
+        "n": 4,
+        "not_classifiable": 0,
+        "not_estimable_reason": null,
+        "proportion": 0.1111111111111111,
+        "total_with_year_record": 36,
+        "upper": 0.2531480859036486
+      },
+      "two_or_more_all": {
+        "N": 84,
+        "estimable": true,
+        "lower": 0.1400676654499156,
+        "n": 18,
+        "not_classifiable": 1,
+        "not_estimable_reason": null,
+        "proportion": 0.21428571428571427,
+        "total_with_year_record": 85,
+        "upper": 0.3134933222156043
+      }
+    },
+    "trend_cochran_armitage_one_two_three_or_more": {
+      "estimable": true,
+      "p_two_sided": 3.197777035618185e-07,
+      "z": 5.111401405677615
+    },
+    "trend_sensitivity_unseparated_as_three_or_more": {
+      "estimable": true,
+      "p_two_sided": 3.143177772601497e-06,
+      "z": 4.66123487345943
+    },
+    "trend_sensitivity_unseparated_as_two": {
+      "estimable": true,
+      "p_two_sided": 3.762133899235961e-07,
+      "z": 5.080615762716395
+    }
+  },
+  "table_c_by_country": {
+    "Poland": {
+      "one": {
+        "N": 39,
+        "columns": {
+          "not_classifiable": {
+            "N": 39,
+            "estimable": true,
+            "lower": 0.004540703100990098,
+            "n": 1,
+            "not_estimable_reason": null,
+            "proportion": 0.02564102564102564,
+            "upper": 0.1318099016985007
+          },
+          "one": {
+            "N": 39,
+            "estimable": true,
+            "lower": 0.40975691648669477,
+            "n": 22,
+            "not_estimable_reason": null,
+            "proportion": 0.5641025641025641,
+            "upper": 0.7069524612431037
+          },
+          "pad_free": {
+            "N": 39,
+            "estimable": true,
+            "lower": 0.2707931000072517,
+            "n": 16,
+            "not_estimable_reason": null,
+            "proportion": 0.41025641025641024,
+            "upper": 0.5658137711710303
+          },
+          "two_or_more": {
+            "N": 39,
+            "estimable": true,
+            "lower": 0.0,
+            "n": 0,
+            "not_estimable_reason": null,
+            "proportion": 0.0,
+            "upper": 0.08966685370757141
+          }
+        },
+        "label": "Exactly one pad per day"
+      },
+      "pad_free_at_three_months": {
+        "N": 9,
+        "columns": {
+          "not_classifiable": {
+            "N": 9,
+            "estimable": true,
+            "lower": 0.0,
+            "n": 0,
+            "not_estimable_reason": null,
+            "proportion": 0.0,
+            "upper": 0.299145048419544
+          },
+          "one": {
+            "N": 9,
+            "estimable": true,
+            "lower": 0.0,
+            "n": 0,
+            "not_estimable_reason": null,
+            "proportion": 0.0,
+            "upper": 0.299145048419544
+          },
+          "pad_free": {
+            "N": 9,
+            "estimable": true,
+            "lower": 0.565000294423344,
+            "n": 8,
+            "not_estimable_reason": null,
+            "proportion": 0.8888888888888888,
+            "upper": 0.980109112361455
+          },
+          "two_or_more": {
+            "N": 9,
+            "estimable": true,
+            "lower": 0.01989088763854488,
+            "n": 1,
+            "not_estimable_reason": null,
+            "proportion": 0.1111111111111111,
+            "upper": 0.434999705576656
+          }
+        },
+        "label": "Pad-free at three months"
+      },
+      "two_or_more_all": {
+        "N": 37,
+        "columns": {
+          "not_classifiable": {
+            "N": 37,
+            "estimable": true,
+            "lower": 0.004786974451940443,
+            "n": 1,
+            "not_estimable_reason": null,
+            "proportion": 0.02702702702702703,
+            "upper": 0.13824069863730515
+          },
+          "one": {
+            "N": 37,
+            "estimable": true,
+            "lower": 0.46100430439217666,
+            "n": 23,
+            "not_estimable_reason": null,
+            "proportion": 0.6216216216216216,
+            "upper": 0.7593600082420174
+          },
+          "pad_free": {
+            "N": 37,
+            "estimable": true,
+            "lower": 0.04285189940411473,
+            "n": 4,
+            "not_estimable_reason": null,
+            "proportion": 0.10810810810810811,
+            "upper": 0.24708531544126022
+          },
+          "two_or_more": {
+            "N": 37,
+            "estimable": true,
+            "lower": 0.13361352989116404,
+            "n": 9,
+            "not_estimable_reason": null,
+            "proportion": 0.24324324324324326,
+            "upper": 0.4011729212144265
+          }
+        },
+        "label": "Two or more pads, all"
+      }
+    },
+    "United States": {
+      "one": {
+        "N": 65,
+        "columns": {
+          "not_classifiable": {
+            "N": 65,
+            "estimable": true,
+            "lower": 0.0027209446020234757,
+            "n": 1,
+            "not_estimable_reason": null,
+            "proportion": 0.015384615384615385,
+            "upper": 0.08213284729551472
+          },
+          "one": {
+            "N": 65,
+            "estimable": true,
+            "lower": 0.24875458464285757,
+            "n": 23,
+            "not_estimable_reason": null,
+            "proportion": 0.35384615384615387,
+            "upper": 0.4752489398976697
+          },
+          "pad_free": {
+            "N": 65,
+            "estimable": true,
+            "lower": 0.46338984873497363,
+            "n": 38,
+            "not_estimable_reason": null,
+            "proportion": 0.5846153846153846,
+            "upper": 0.6963975844257737
+          },
+          "two_or_more": {
+            "N": 65,
+            "estimable": true,
+            "lower": 0.01581984041351258,
+            "n": 3,
+            "not_estimable_reason": null,
+            "proportion": 0.046153846153846156,
+            "upper": 0.12713847263338826
+          }
+        },
+        "label": "Exactly one pad per day"
+      },
+      "pad_free_at_three_months": {
+        "N": 71,
+        "columns": {
+          "not_classifiable": {
+            "N": 71,
+            "estimable": true,
+            "lower": 0.014473260620475333,
+            "n": 3,
+            "not_estimable_reason": null,
+            "proportion": 0.04225352112676056,
+            "upper": 0.11702416040484681
+          },
+          "one": {
+            "N": 71,
+            "estimable": true,
+            "lower": 0.022124519301696656,
+            "n": 4,
+            "not_estimable_reason": null,
+            "proportion": 0.056338028169014086,
+            "upper": 0.13609605799976943
+          },
+          "pad_free": {
+            "N": 71,
+            "estimable": true,
+            "lower": 0.8101927775940714,
+            "n": 64,
+            "not_estimable_reason": null,
+            "proportion": 0.9014084507042254,
+            "upper": 0.9514171762760306
+          },
+          "two_or_more": {
+            "N": 71,
+            "estimable": true,
+            "lower": 0.0,
+            "n": 0,
+            "not_estimable_reason": null,
+            "proportion": 0.0,
+            "upper": 0.051327952196890334
+          }
+        },
+        "label": "Pad-free at three months"
+      },
+      "two_or_more_all": {
+        "N": 48,
+        "columns": {
+          "not_classifiable": {
+            "N": 48,
+            "estimable": true,
+            "lower": 0.0,
+            "n": 0,
+            "not_estimable_reason": null,
+            "proportion": 0.0,
+            "upper": 0.07410012966611748
+          },
+          "one": {
+            "N": 48,
+            "estimable": true,
+            "lower": 0.2702082786059137,
+            "n": 19,
+            "not_estimable_reason": null,
+            "proportion": 0.3958333333333333,
+            "upper": 0.5368959150745275
+          },
+          "pad_free": {
+            "N": 48,
+            "estimable": true,
+            "lower": 0.28849667778411564,
+            "n": 20,
+            "not_estimable_reason": null,
+            "proportion": 0.4166666666666667,
+            "upper": 0.5571866771602372
+          },
+          "two_or_more": {
+            "N": 48,
+            "estimable": true,
+            "lower": 0.10191390954847648,
+            "n": 9,
+            "not_estimable_reason": null,
+            "proportion": 0.1875,
+            "upper": 0.31939867149284695
+          }
+        },
+        "label": "Two or more pads, all"
+      }
+    }
+  },
+  "table_c_unknown_or_other_country_counts": {
+    "one": 0,
+    "pad_free_at_three_months": 0,
+    "two_or_more_all": 0
+  },
+  "table_d_recovery_after_six_months": {
+    "six_month_accounting": {
+      "early_users": 364,
+      "early_users_six_month_pad_free": 31,
+      "early_users_six_month_pad_use": 131,
+      "early_users_with_six_and_year_record": 120,
+      "early_users_with_six_month_record": 162,
+      "six_month_pad_free_with_year_record": 27,
+      "six_month_pad_use_with_year_record": 93
+    },
+    "six_month_pad_free_with_year_record": {
+      "one": {
+        "N": 19,
+        "estimable": true,
+        "lower": 0.6860591728889098,
+        "n": 17,
+        "not_estimable_reason": null,
+        "proportion": 0.8947368421052632,
+        "upper": 0.9706414397011298
+      },
+      "other_uncertain_or_unresolved": {
+        "N": 0,
+        "estimable": false,
+        "lower": null,
+        "n": 0,
+        "not_estimable_reason": "ZERO_DENOMINATOR",
+        "proportion": null,
+        "upper": null
+      },
+      "overall": {
+        "N": 27,
+        "estimable": true,
+        "lower": 0.7663040731697685,
+        "n": 25,
+        "not_estimable_reason": null,
+        "proportion": 0.9259259259259259,
+        "upper": 0.9794453459390112
+      },
+      "two_or_more": {
+        "N": 8,
+        "estimable": true,
+        "lower": 0.6755924351161198,
+        "n": 8,
+        "not_estimable_reason": null,
+        "proportion": 1.0,
+        "upper": 1.0
+      }
+    },
+    "six_month_pad_use_with_year_record": {
+      "one": {
+        "N": 46,
+        "estimable": true,
+        "lower": 0.22680993370754338,
+        "n": 16,
+        "not_estimable_reason": null,
+        "proportion": 0.34782608695652173,
+        "upper": 0.49229941157937235
+      },
+      "other_uncertain_or_unresolved": {
+        "N": 8,
+        "estimable": true,
+        "lower": 0.13684428582359742,
+        "n": 3,
+        "not_estimable_reason": null,
+        "proportion": 0.375,
+        "upper": 0.6942576053973727
+      },
+      "overall": {
+        "N": 93,
+        "estimable": true,
+        "lower": 0.20785401544334203,
+        "n": 27,
+        "not_estimable_reason": null,
+        "proportion": 0.2903225806451613,
+        "upper": 0.38942590500674035
+      },
+      "two_or_more": {
+        "N": 39,
+        "estimable": true,
+        "lower": 0.10779718230710388,
+        "n": 8,
+        "not_estimable_reason": null,
+        "proportion": 0.20512820512820512,
+        "upper": 0.3553396801358229
+      }
+    },
+    "six_month_window_days": [
+      150,
+      210
+    ],
+    "year_window_days": [
+      305,
+      425
+    ]
+  }
+}

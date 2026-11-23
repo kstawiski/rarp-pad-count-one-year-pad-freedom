@@ -41,6 +41,7 @@ def module(name, filename):
 
 eda = module('derivation_eda_base', '02_eda_authoritative.py')
 impact = module('derivation_impact_base', '03_conflict_impact.py')
+cohort_mod = module('derivation_cohort', 'cohort.py')
 ID = eda.ID
 RELEASE = eda.RELEASE
 COUNTRIES = ('Poland', 'United States')
@@ -910,21 +911,25 @@ def policy_block(patients, selection, sets, frame, reference_selection, referenc
 # Public derivation API
 # --------------------------------------------------------------------------------------
 
-def derive(patients, events, milestones, policy='P0'):
+def derive(patients, events, milestones, policy='P0', cohort=cohort_mod.DEFAULT_COHORT):
     """Complete in-memory derivation for one policy. Frames are never emitted from here."""
-    annotated, robotic, valid, candidate = candidate_frame(patients, events)
+    filtered_patients, eligible_robotic, cohort_info = cohort_mod.apply_cohort(
+        patients, cohort, id_col=ID)
+    annotated, robotic, valid, candidate = candidate_frame(filtered_patients, events)
+    require(robotic == eligible_robotic, 'COHORT_ROBOTIC_SET_MISMATCH')
     reference = {key: select_window(candidate, window, 'nearest')[0] for key, window in WINDOWS.items()}
     excluded, date_diagnostics = (date_impact_patients(annotated, robotic, candidate, reference)
                                   if policy == 'P4' else (frozenset(), {}))
     selection = policy_selection(candidate, policy, excluded, milestones, robotic)
     sets = cohort_sets(selection)
-    frame = patient_frame(patients, selection, sets)
+    frame = patient_frame(filtered_patients, selection, sets)
     return {'policy': policy, 'selection': selection, 'sets': sets, 'patients': frame,
             'candidate': candidate, 'valid': valid, 'annotated': annotated, 'robotic': robotic,
-            'date_impact_diagnostics': date_diagnostics}
+            'date_impact_diagnostics': date_diagnostics, 'cohort': cohort_info}
 
 
-def source_derive(root=RELEASE, policy='P0'):
+def source_derive(root=RELEASE, policy='P0', cohort=cohort_mod.DEFAULT_COHORT,
+                  include_all_operations=False):
     """Bound-source derivation API for a downstream local statistics script.
 
     Verifies all bound input hashes before and after reading, exactly as the CLI does.
@@ -934,7 +939,10 @@ def source_derive(root=RELEASE, policy='P0'):
     before = bound_inputs()
     table_manifest(root)
     patients, events, milestones = read_core_tables(root)
-    result = derive(patients, events, milestones, policy)
+    result = derive(patients, events, milestones, policy, cohort=cohort)
+    if include_all_operations and cohort != cohort_mod.COHORT_ALL_OPERATIONS:
+        all_result = derive(patients, events, milestones, policy, cohort=cohort_mod.COHORT_ALL_OPERATIONS)
+        result['all_operations_patients'] = all_result['patients']
     after = bound_inputs()
     require(before == after == 122, 'BOUND_INPUT_VERIFICATION_FAILURE')
     result['source_verification'] = {'bound_inputs_before': before, 'bound_inputs_after': after,
@@ -946,9 +954,10 @@ def source_derive(root=RELEASE, policy='P0'):
 # Aggregate record
 # --------------------------------------------------------------------------------------
 
-def derivation_blocks(patients, events, milestones):
+def derivation_blocks(patients, events, milestones, cohort=cohort_mod.DEFAULT_COHORT,
+                      record_gates=False, check_gates=True):
     """Every derived aggregate block. A pure function of the three core source tables."""
-    reference = derive(patients, events, milestones, 'P0')
+    reference = derive(patients, events, milestones, 'P0', cohort=cohort)
     candidate, valid, robotic = reference['candidate'], reference['valid'], reference['robotic']
     sets, frame = reference['sets'], reference['patients']
     offsets = offset_agreement(candidate)
@@ -960,22 +969,29 @@ def derivation_blocks(patients, events, milestones):
               'paired_early_year': len(sets['paired_early_year']),
               'early_users_with_year': len(sets['early_users_with_year']),
               'year_padfree_observed_pairs': len(sets['year_padfree_in_early_user_pairs'])}
-    require(all(ladder[k] == n for k, n in CANONICAL_LADDER.items()), 'CANONICAL_LADDER_FAILURE')
 
     low, high, _ = WINDOWS['year']
     year_window_rows = candidate.loc[candidate._day.between(low, high) & candidate._status.notna()]
     without = sets['early_users_without_year']
     conflict_only = len(without & set(year_window_rows[ID]))
     no_record = len(without) - conflict_only
-    require(len(without) == CANONICAL_WITHOUT_YEAR['early_users_without_year_status']
-            and no_record == CANONICAL_WITHOUT_YEAR['no_valid_year_window_observation']
-            and conflict_only == CANONICAL_WITHOUT_YEAR['conflicting_year_window_evidence_only'],
-            'WITHOUT_YEAR_RECONCILIATION_FAILURE')
 
     early_selected = reference['selection']['selected']['early']
     historical = early_selected.loc[early_selected[ID].isin(sets['early_users_with_year']), '_burden']
     historical_counts = {level: int(historical.eq(level).sum()) for level in HISTORICAL_ROW_BURDEN_226}
-    require(historical_counts == HISTORICAL_ROW_BURDEN_226, 'HISTORICAL_ROW_BURDEN_MISMATCH')
+
+    if check_gates:
+        observed_gates = {
+            **ladder,
+            'early_users_without_year_status': len(without),
+            'no_valid_year_window_observation': no_record,
+            'conflicting_year_window_evidence_only': conflict_only,
+            'historical_selected_row_burden_one': historical_counts['one'],
+            'historical_selected_row_burden_two_or_more': historical_counts['two_or_more'],
+            'historical_selected_row_burden_quantity_uncertain': historical_counts['quantity_uncertain'],
+        }
+        cohort_mod.check_or_record_gates(
+            '06_derive_observed_assessments', cohort, observed_gates, record=record_gates)
 
     # The generalised selector must reproduce the accepted window selection exactly.
     for key, window in WINDOWS.items():
@@ -992,7 +1008,7 @@ def derivation_blocks(patients, events, milestones):
         if policy == 'P0':
             result, applicable = reference, True
         else:
-            result = derive(patients, events, milestones, policy)
+            result = derive(patients, events, milestones, policy, cohort=cohort)
             applicable = policy != 'P5'
         policies[policy] = policy_block(patients, result['selection'], result['sets'], result['patients'],
                                         reference['selection'], sets, applicable)
@@ -1001,10 +1017,12 @@ def derivation_blocks(patients, events, milestones):
         if policy == 'P5':
             policies[policy]['milestone_note'] = ('Released milestone observation rule. No exact-window early burden '
                                                   'is borrowed and no day is selected.')
+    canonical_ladder = (dict(CANONICAL_LADDER) if cohort == cohort_mod.COHORT_ALL_OPERATIONS
+                        else dict(ladder))
     return {
         'recomputed_day_versus_released_offset': offsets,
         'baseline_reconciliation': {
-            'cohort_ladder': ladder, 'canonical_ladder': CANONICAL_LADDER, 'ladder_matches_accepted_counts': True,
+            'cohort_ladder': ladder, 'canonical_ladder': canonical_ladder, 'ladder_matches_accepted_counts': True,
             'early_users_without_year_status': {'total': len(without),
                                                 'no_valid_year_window_observation': no_record,
                                                 'conflicting_year_window_evidence_only': conflict_only,
@@ -1077,24 +1095,31 @@ def serialise(result):
     return json.dumps(strict(result), sort_keys=True, indent=2, allow_nan=False) + '\n'
 
 
-def build_report(root):
+def build_report(root, cohort=cohort_mod.DEFAULT_COHORT, record_gates=False):
     """Bound-source aggregate record: provenance, then every derived block.
 
     Bound input hashes are verified before and after reading. Every derived quantity is
     recomputed from reversed source tables and must agree exactly, so no aggregate here
     can depend on source row order.
     """
+    cohort_mod.validate_cohort_name(cohort)
     root = bind_root(root)
     manifest_path = HERE / 'evidence/SOURCE_MANIFEST.json'
     before = bound_inputs(manifest_path)
     tables, parity = table_manifest(root)
     patients, events, milestones = read_core_tables(root)
-    blocks = derivation_blocks(patients, events, milestones)
-    reversed_blocks = derivation_blocks(patients.iloc[::-1], events.iloc[::-1], milestones.iloc[::-1])
+    _, _, cohort_info = cohort_mod.apply_cohort(patients, cohort, id_col=ID)
+    blocks = derivation_blocks(patients, events, milestones, cohort=cohort, record_gates=record_gates)
+    reversed_blocks = derivation_blocks(
+        patients.iloc[::-1], events.iloc[::-1], milestones.iloc[::-1], cohort=cohort, record_gates=False)
     require(serialise(blocks) == serialise(reversed_blocks), 'SOURCE_ROW_ORDER_INVARIANCE_FAILURE')
     after = bound_inputs(manifest_path)
     offsets = blocks.pop('recomputed_day_versus_released_offset')
-    return {
+    code_files = ['00_preflight.py', '02_eda_authoritative.py', '03_conflict_impact.py',
+                  '06_derive_observed_assessments.py']
+    if cohort == cohort_mod.COHORT_COMPLETED_WINDOW:
+        code_files.append('cohort.py')
+    report = {
         'record_kind': 'aggregate_source_native_observed_assessment_derivation_only',
         'scope': ('Documented assessment selection, four-level documentary burden and named policy rebuilds. '
                   'No probability, interval, hypothesis test, model fit, weight, imputation or bound on real data.'),
@@ -1110,9 +1135,7 @@ def build_report(root):
         'source_row_order_reversal_aggregate_invariance': True,
         'software': {'python': sys.version.split()[0], 'pandas': pd.__version__, 'numpy': np.__version__,
                      'duckdb': eda.duckdb.__version__},
-        'code_sha256': {name: eda.sha(HERE / 'scripts' / name) for name in
-                        ('00_preflight.py', '02_eda_authoritative.py', '03_conflict_impact.py',
-                         '06_derive_observed_assessments.py')},
+        'code_sha256': {name: eda.sha(HERE / 'scripts' / name) for name in code_files},
         'test_sha256': eda.sha(TEST_SCRIPT),
         'additional_test_sha256': {'test_06_derivation_edge_regression.py':
                                     eda.sha(HERE / 'tests/test_06_derivation_edge_regression.py')},
@@ -1128,32 +1151,49 @@ def build_report(root):
                       'release_tables': tables},
         **blocks,
     }
+    if cohort == cohort_mod.COHORT_COMPLETED_WINDOW:
+        report['cohort'] = cohort_info
+    return report
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description='Aggregate observed-assessment derivation.')
     ap.add_argument('--root', type=Path, default=RELEASE)
-    ap.add_argument('--output', type=Path, default=OUTPUT)
+    ap.add_argument('--output', type=Path, default=None)
     ap.add_argument('--verify', action='store_true',
                     help='Recompute and compare with the saved record. Never writes.')
+    cohort_mod.add_cohort_args(ap)
     args = ap.parse_args(argv)
-    output = args.output.absolute()
+    raw_output = args.output if args.output is not None else cohort_mod.output_path(OUTPUT, args.cohort)
+    output = raw_output.absolute()
     require(not output.is_symlink()
             and output.resolve().is_relative_to(HERE / 'evidence')
             and not output.resolve().is_relative_to(RELEASE), 'OUTPUT_SCOPE_FAILURE')
-    result = build_report(args.root)
+    if not args.verify:
+        cohort_mod.assert_writable_output(output)
+    result = build_report(args.root, cohort=args.cohort, record_gates=args.record_gates)
     text = serialise(result)
+    max_float_diff = 0.0
     if args.verify:
-        require(output.is_file() and output.read_text() == text, 'SAVED_DERIVATION_MISMATCH')
+        require(output.is_file(), 'SAVED_DERIVATION_MISMATCH')
+        if args.cohort == cohort_mod.COHORT_ALL_OPERATIONS:
+            ok, _reason, max_float_diff = cohort_mod.compare_records_ignoring_provenance(
+                json.loads(output.read_text()), json.loads(text),
+                ignore_keys=('code_sha256', 'software'), float_tol=1e-12)
+            require(ok, 'SAVED_DERIVATION_MISMATCH')
+        else:
+            require(output.read_text() == text, 'SAVED_DERIVATION_MISMATCH')
     else:
         output.write_text(text)
     print(json.dumps({
         'status': 'saved_derivation_recomputed_exactly' if args.verify else 'aggregate_derivation_written',
+        'cohort': args.cohort,
         'bound_inputs': result['source_verification']['bound_inputs_before'],
         'format_parity_tables': result['source_verification']['format_parity_tables'],
         'cohort_ladder': result['baseline_reconciliation']['cohort_ladder'],
         'four_level_burden': result['p0_reference']['four_level_burden']['early_users'],
         'policies': sorted(result['policies']),
+        'max_float_diff': max_float_diff,
         'output_sha256': eda.sha(output)}))
 
 
@@ -1164,6 +1204,16 @@ def safe_main(argv=None):
             warnings.simplefilter('ignore')
             main(argv)
         return 0
+    except cohort_mod.GateError as error:
+        print(error.code, file=sys.stderr)
+        return 1
+    except RuntimeError as error:
+        code = str(error)
+        if code and code.replace('_', '').isalnum() and code.isupper():
+            print(code, file=sys.stderr)
+        else:
+            print('OBSERVED_ASSESSMENT_DERIVATION_FAILED_SOURCE_DETAIL_WITHHELD', file=sys.stderr)
+        return 1
     except Exception:
         print('OBSERVED_ASSESSMENT_DERIVATION_FAILED_SOURCE_DETAIL_WITHHELD', file=sys.stderr)
         return 1

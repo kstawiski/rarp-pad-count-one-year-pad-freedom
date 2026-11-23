@@ -1,0 +1,353 @@
+{
+  "amendment": "A-OBS-5",
+  "analysis_id": "M1-STRENGTHENING",
+  "clinical_model_checks": {
+    "e_value": 2.891052800608007,
+    "e_value_lower_limit": 1.690290579682653,
+    "firth": {
+      "bootstrap_lower": 0.06627363871695731,
+      "bootstrap_upper": 0.35527474304108747,
+      "failed_fits": 0,
+      "odds_ratio_two_or_more": 0.36169385828776734,
+      "seed": 20260932,
+      "standardized_difference": 0.20940837674705587,
+      "standardized_one_pad": 0.5166856039969641,
+      "standardized_two_or_more": 0.3072772272499082
+    },
+    "seed": 20260926,
+    "standardized_risk_ratio": 1.7478046268526664,
+    "standardized_risk_ratio_bootstrap_lower": 1.2001616632661474,
+    "standardized_risk_ratio_bootstrap_upper": 2.7837732533236808
+  },
+  "code_sha256": "333deea08744131967805d3d9d321a0f2ef91eca725d4bed22745c4dfd6f1b2f",
+  "cohort": {
+    "cohort_name": "completed_window",
+    "common_extract_date": "2026-04-01",
+    "eligible_robotic_patients": 1022,
+    "excluded_robotic_patients": 375,
+    "model_recent_period_start_year": 2024,
+    "robotic_patients_total": 1397,
+    "rule_name": "operation_date_plus_425_days_before_2026_04_01",
+    "unusable_operation_date_all_released_patients": 0,
+    "unusable_operation_date_robotic_patients": 0,
+    "year_window_close_day": 425
+  },
+  "country_heterogeneity": {
+    "bootstrap_lower": -0.1349528114919906,
+    "bootstrap_upper": 0.39707986300599873,
+    "bootstrap_valid": 2000,
+    "difference_poland_minus_united_states": 0.13419958419958417,
+    "leave_one_centre_out": {
+      "without_belchatow": {
+        "bootstrap_lower": 0.015120820457081149,
+        "bootstrap_upper": 0.3338887050797531,
+        "difference": 0.1788835384341002,
+        "n": 152,
+        "newcombe_lower": 0.018421788580916282,
+        "newcombe_upper": 0.3248382638301146,
+        "one_events": 47,
+        "one_n": 89,
+        "two_events": 22,
+        "two_n": 63
+      },
+      "without_brigham": {
+        "bootstrap_lower": 0.11567434241852846,
+        "bootstrap_upper": 0.48055555555555557,
+        "difference": 0.30214830214830213,
+        "n": 76,
+        "newcombe_lower": 0.10526082396907663,
+        "newcombe_upper": 0.47083874440612683,
+        "one_events": 16,
+        "one_n": 39,
+        "two_events": 4,
+        "two_n": 37
+      },
+      "without_salve_medica": {
+        "bootstrap_lower": 0.09289711006353767,
+        "bootstrap_upper": 0.3972181793302481,
+        "difference": 0.24821428571428572,
+        "n": 150,
+        "newcombe_lower": 0.08898800110347949,
+        "newcombe_upper": 0.3897320467609473,
+        "one_events": 45,
+        "one_n": 80,
+        "two_events": 22,
+        "two_n": 70
+      }
+    },
+    "logistic_interaction_lr_chi2": 2.2691907402694085,
+    "logistic_interaction_or": 2.912716574043804,
+    "logistic_interaction_p": 0.13196879724764968,
+    "seed": 20260907,
+    "wald_p": 0.31187373862801615,
+    "wald_z": 1.0112981763810993
+  },
+  "draws": 2000,
+  "epic_agreement": {
+    "preoperative_score_one_vs_two_or_more": {
+      "group_a": {
+        "median": 0.0,
+        "n": 14,
+        "q1": 0.0,
+        "q3": 0.0
+      },
+      "group_b": {
+        "median": 1.0,
+        "n": 14,
+        "q1": 0.0,
+        "q3": 2.0
+      },
+      "mann_whitney_p": 0.010600492686147734
+    },
+    "three_month_score_one_vs_two_or_more": {
+      "group_a": {
+        "median": 3.0,
+        "n": 17,
+        "q1": 3.0,
+        "q3": 4.0
+      },
+      "group_b": {
+        "median": 7.5,
+        "n": 14,
+        "q1": 6.25,
+        "q3": 9.0
+      },
+      "mann_whitney_p": 6.220014259668275e-06
+    },
+    "twelve_month_score_pad_free_vs_pad_use": {
+      "group_a": {
+        "median": 1.0,
+        "n": 8,
+        "q1": 0.0,
+        "q3": 2.0
+      },
+      "group_b": {
+        "median": 3.0,
+        "n": 15,
+        "q1": 3.0,
+        "q3": 4.5
+      },
+      "mann_whitney_p": 0.0001355129096908701
+    }
+  },
+  "gradient": {
+    "odds_ratio_per_pad_level": {
+      "n": 178,
+      "or": 0.5221462176423848,
+      "wald_ci": [
+        0.3494608663471244,
+        0.7801636716811512
+      ]
+    },
+    "one": {
+      "early_users": 189,
+      "events": 54,
+      "n": 104
+    },
+    "pad_free_at_three_months": {
+      "events": 72,
+      "n": 80
+    },
+    "three_or_more": {
+      "early_users": 65,
+      "events": 8,
+      "n": 38
+    },
+    "trend_including_pad_free_at_three_months": {
+      "p_two_sided": 1.256003645759059e-13,
+      "z": -7.410736030466037
+    },
+    "trend_pad_users_exact": {
+      "p_two_sided": 0.0011588809586219816,
+      "z": -3.248811867978467
+    },
+    "trend_unseparated_as_three_or_more": {
+      "p_two_sided": 0.00010873225995362792,
+      "z": -3.870231034635916
+    },
+    "trend_unseparated_as_two": {
+      "p_two_sided": 0.00047554756082825655,
+      "z": -3.4941646916156133
+    },
+    "two": {
+      "early_users": 56,
+      "events": 15,
+      "n": 36
+    },
+    "two_or_more_unseparated": {
+      "early_users": 16,
+      "events": 1,
+      "n": 11
+    }
+  },
+  "outcome_definitions": {
+    "pad_users_at_one_year": 111,
+    "pad_users_at_one_year_with_diaper_recorded": 0,
+    "pad_users_at_one_year_with_safety_pad_recorded": 0,
+    "social_continence_no_pads_or_at_most_one": {
+      "bootstrap_lower": 0.0905204498389323,
+      "bootstrap_upper": 0.2800495692222993,
+      "difference": 0.18487394957983194,
+      "excluded_pad_users_without_a_valid_count": 3,
+      "n": 186,
+      "newcombe_lower": 0.09337213633209562,
+      "newcombe_upper": 0.2859527930963328,
+      "one_events": 99,
+      "one_n": 102,
+      "two_events": 66,
+      "two_n": 84
+    },
+    "widened_one_year_window": {
+      "added_men": 39,
+      "bootstrap_lower": 0.1097209467326965,
+      "bootstrap_upper": 0.3620126622564732,
+      "difference": 0.23458330084976997,
+      "n": 228,
+      "newcombe_lower": 0.10700736382603493,
+      "newcombe_upper": 0.3501105975230137,
+      "one_events": 65,
+      "one_n": 127,
+      "two_events": 28,
+      "two_n": 101,
+      "window_days": [
+        305,
+        545
+      ]
+    }
+  },
+  "prognostic_value": {
+    "c_apparent_with_pad_group": 0.7666197183098592,
+    "c_apparent_without_pad_group": 0.7288732394366197,
+    "c_corrected_with_pad_group": 0.7042466872373817,
+    "c_corrected_without_pad_group": 0.6641958778910853,
+    "c_pad_group_alone": 0.6109859154929578,
+    "calibration_slope_draws": 1967,
+    "calibration_slope_optimism_corrected": 0.6932136986860558,
+    "draws": 2000,
+    "events": 71,
+    "failed_draws": 33,
+    "gain_bootstrap_lower": 0.0001443409172183441,
+    "gain_bootstrap_upper": 0.09003383988093776,
+    "lr_chi2_adding_pad_group": 9.221851828888703,
+    "lr_p": 0.0023914354155046016,
+    "n": 171,
+    "seed": 20260930
+  },
+  "record_availability": {
+    "bootstrap_lower": 0.102682841800193,
+    "bootstrap_upper": 0.36841846501588965,
+    "completed_difference_lower_limit_at_zero_shift": 0.10149528474742266,
+    "covariates": [
+      "intercept",
+      "two_or_more",
+      "age_per10_cent65",
+      "early_day_per30_cent90",
+      "centre_belchatow",
+      "centre_salve",
+      "period_recent",
+      "nerve_sparing_not_performed",
+      "nerve_sparing_not_stated",
+      "pt3_or_higher"
+    ],
+    "effective_sample_size": {
+      "one": 99.36619214747219,
+      "two_or_more": 82.4801738274397
+    },
+    "failed_fits": 0,
+    "max_weight": 3.3070896252645334,
+    "n": 326,
+    "seed": 20260931,
+    "status_by_record_availability": {
+      "one|with_year_record": {
+        "n": 104,
+        "six_month_pad_free": 19,
+        "six_month_record": 65,
+        "two_year_pad_free": 14,
+        "two_year_record": 30
+      },
+      "one|without_year_record": {
+        "n": 85,
+        "six_month_pad_free": 4,
+        "six_month_record": 23,
+        "two_year_pad_free": 7,
+        "two_year_record": 14
+      },
+      "two_or_more|with_year_record": {
+        "n": 85,
+        "six_month_pad_free": 8,
+        "six_month_record": 47,
+        "two_year_pad_free": 7,
+        "two_year_record": 23
+      },
+      "two_or_more|without_year_record": {
+        "n": 52,
+        "six_month_pad_free": 0,
+        "six_month_record": 11,
+        "two_year_pad_free": 2,
+        "two_year_record": 8
+      }
+    },
+    "tipping_grid_step": 0.001,
+    "tipping_seed": 20260933,
+    "tipping_shift_lower_confidence_limit": 0.121,
+    "tipping_shift_point_estimate": 0.286,
+    "tipping_valid_draws": 2000,
+    "weighted_difference": 0.23112533371281418,
+    "weighted_one_pad": 0.5042347736973157,
+    "weighted_two_or_more": 0.27310943998450155
+  },
+  "risk_ratio": {
+    "bootstrap_lower": 1.2918346774193548,
+    "bootstrap_upper": 2.8099863627958555,
+    "bootstrap_valid": 2000,
+    "classification_of_persistent_pad_use_by_two_or_more": {
+      "negative_predictive_value": 0.5192307692307693,
+      "positive_predictive_value": 0.7176470588235294,
+      "sensitivity": 0.5495495495495496,
+      "specificity": 0.6923076923076923
+    },
+    "e_value": 3.0810238280960225,
+    "e_value_katz_lower_limit": 1.808881018591016,
+    "estimate": 1.838942307692308,
+    "katz_lower": 1.2499419324382777,
+    "katz_upper": 2.7054927299094356,
+    "persistent_pad_use_one": {
+      "n": 50,
+      "of": 104
+    },
+    "persistent_pad_use_two_or_more": {
+      "n": 61,
+      "of": 85
+    },
+    "seed": 20260907
+  },
+  "status": "exploratory_post_hoc_disclosed",
+  "unclassified_bounds": {
+    "all_assigned_one": {
+      "bootstrap_lower": 0.043877018758818866,
+      "bootstrap_upper": 0.30203875524511964,
+      "difference": 0.17077205882352942,
+      "n": 213,
+      "newcombe_lower": 0.03772611124031486,
+      "newcombe_upper": 0.2917024032536567,
+      "one_events": 58,
+      "one_n": 128,
+      "two_events": 24,
+      "two_n": 85
+    },
+    "all_assigned_two_or_more": {
+      "bootstrap_lower": 0.13955004303688512,
+      "bootstrap_upper": 0.3856793252314351,
+      "difference": 0.26235003528581513,
+      "n": 213,
+      "newcombe_lower": 0.13196874505919506,
+      "newcombe_upper": 0.3809167276273936,
+      "one_events": 54,
+      "one_n": 104,
+      "two_events": 28,
+      "two_n": 109
+    },
+    "unclassified_n": 24,
+    "unclassified_pad_free": 4
+  }
+}

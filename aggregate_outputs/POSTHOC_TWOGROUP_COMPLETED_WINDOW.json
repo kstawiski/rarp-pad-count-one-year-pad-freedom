@@ -1,0 +1,618 @@
+{
+  "amendment": "A-OBS-2",
+  "analysis_id": "M1-POSTHOC",
+  "calibration": {
+    "country_standardized_difference": 0.2219,
+    "overall_events": 82,
+    "p0_difference": 0.2368778280542987
+  },
+  "centre_adjusted_sensitivity": {
+    "no_yearday": {
+      "bootstrap": {
+        "draws": 2000,
+        "failed_fits": 0,
+        "lower": 0.1171750377750177,
+        "seed": 20260924,
+        "upper": 0.3788467977121398
+      },
+      "converged": true,
+      "covariates": [
+        "intercept",
+        "burden_two_or_more",
+        "age_per10_cent65",
+        "early_day_per30_cent90",
+        "centre_belchatow",
+        "centre_salve",
+        "period_recent"
+      ],
+      "params": {
+        "age_per10_cent65": {
+          "coef": -0.42705044341190307,
+          "or": 0.6524306405702788,
+          "wald_ci": [
+            -0.9052950817129406,
+            0.05119419488913446
+          ]
+        },
+        "burden_two_or_more": {
+          "coef": -1.2029618835328748,
+          "or": 0.300303429583715,
+          "wald_ci": [
+            -1.891421239498864,
+            -0.5145025275668854
+          ]
+        },
+        "centre_belchatow": {
+          "coef": -1.784372184413846,
+          "or": 0.1679024396861221,
+          "wald_ci": [
+            -2.850355753392644,
+            -0.7183886154350485
+          ]
+        },
+        "centre_salve": {
+          "coef": -1.5096650183256886,
+          "or": 0.2209839911495062,
+          "wald_ci": [
+            -2.4147901862474823,
+            -0.6045398504038948
+          ]
+        },
+        "early_day_per30_cent90": {
+          "coef": -1.017925081121084,
+          "or": 0.36134392219183503,
+          "wald_ci": [
+            -1.7751554726883496,
+            -0.2606946895538186
+          ]
+        },
+        "intercept": {
+          "coef": 0.7973844554854794,
+          "or": 2.219727533036561,
+          "wald_ci": [
+            0.10301215821927423,
+            1.4917567527516846
+          ]
+        },
+        "period_recent": {
+          "coef": -0.13178124500938534,
+          "or": 0.8765327200151558,
+          "wald_ci": [
+            -0.8034224573300578,
+            0.539859967311287
+          ]
+        }
+      },
+      "standardized_difference": 0.24870124028684654,
+      "standardized_one_pad": 0.5229763527356981,
+      "standardized_two_or_more": 0.27427511244885155
+    },
+    "with_yearday": {
+      "bootstrap": {
+        "draws": 2000,
+        "failed_fits": 0,
+        "lower": 0.10150301436686933,
+        "seed": 20260925,
+        "upper": 0.3670988437149371
+      },
+      "converged": true,
+      "covariates": [
+        "intercept",
+        "burden_two_or_more",
+        "age_per10_cent65",
+        "early_day_per30_cent90",
+        "centre_belchatow",
+        "centre_salve",
+        "period_recent",
+        "year_day_per30_cent365"
+      ],
+      "params": {
+        "age_per10_cent65": {
+          "coef": -0.4261723193065663,
+          "or": 0.6530038072617371,
+          "wald_ci": [
+            -0.9059061578715868,
+            0.05356151925845415
+          ]
+        },
+        "burden_two_or_more": {
+          "coef": -1.16950754535231,
+          "or": 0.31051982054816757,
+          "wald_ci": [
+            -1.8615949817039907,
+            -0.47742010900062926
+          ]
+        },
+        "centre_belchatow": {
+          "coef": -1.8676177181667242,
+          "or": 0.15449126550869802,
+          "wald_ci": [
+            -2.9550049750240417,
+            -0.7802304613094064
+          ]
+        },
+        "centre_salve": {
+          "coef": -1.5297634525228088,
+          "or": 0.2165868943404054,
+          "wald_ci": [
+            -2.4420282891040785,
+            -0.617498615941539
+          ]
+        },
+        "early_day_per30_cent90": {
+          "coef": -1.0379721742584975,
+          "or": 0.35417215366925414,
+          "wald_ci": [
+            -1.800573308465328,
+            -0.2753710400516671
+          ]
+        },
+        "intercept": {
+          "coef": 0.7702738338647467,
+          "or": 2.1603577519075507,
+          "wald_ci": [
+            0.06694082516271982,
+            1.4736068425667734
+          ]
+        },
+        "period_recent": {
+          "coef": -0.11887249446804234,
+          "or": 0.8879210083850081,
+          "wald_ci": [
+            -0.79460146333412,
+            0.5568564743980352
+          ]
+        },
+        "year_day_per30_cent365": {
+          "coef": 0.17817861420810568,
+          "or": 1.1950387530737898,
+          "wald_ci": [
+            -0.13672615192392648,
+            0.4930833803401379
+          ]
+        }
+      },
+      "standardized_difference": 0.24035348764343267,
+      "standardized_one_pad": 0.5188690034663288,
+      "standardized_two_or_more": 0.27851551582289613
+    }
+  },
+  "code_sha256": "47c58d9ca16b35b5bd321d8ee8171104b80c11db0319dc6f1c8686267575ab54",
+  "cohort": {
+    "cohort_name": "completed_window",
+    "common_extract_date": "2026-04-01",
+    "eligible_robotic_patients": 1022,
+    "excluded_robotic_patients": 375,
+    "model_recent_period_start_year": 2024,
+    "robotic_patients_total": 1397,
+    "rule_name": "operation_date_plus_425_days_before_2026_04_01",
+    "unusable_operation_date_all_released_patients": 0,
+    "unusable_operation_date_robotic_patients": 0,
+    "year_window_close_day": 425
+  },
+  "draws": 2000,
+  "epic_excluded_contrast": {
+    "a_events": 52,
+    "a_n": 99,
+    "b_events": 21,
+    "b_n": 80,
+    "bootstrap_ci": [
+      0.13194444444444442,
+      0.39835858585858586
+    ],
+    "difference": 0.2627525252525253,
+    "excluded_epic_pairs": 10,
+    "failed_draws": 0
+  },
+  "exact_count_only_subset": {
+    "a_events": 54,
+    "a_n": 104,
+    "b_events": 21,
+    "b_n": 62,
+    "bootstrap_ci": [
+      0.02567462779156323,
+      0.3192307692307689
+    ],
+    "bootstrap_lower": 0.02567462779156323,
+    "bootstrap_upper": 0.3192307692307689,
+    "difference": 0.18052109181141446,
+    "failed_draws": 0
+  },
+  "p6_contrast_consistent_rule": {
+    "a_events": 54,
+    "a_n": 104,
+    "b_events": 24,
+    "b_n": 85,
+    "bootstrap_ci": [
+      0.10328054298642536,
+      0.3769768099547508
+    ],
+    "difference": 0.2368778280542987,
+    "failed_draws": 0,
+    "reclassified_unresolved_by_year_status": {
+      "pad_use": 2
+    },
+    "reclassified_unresolved_count": 2
+  },
+  "posthoc_adjusted_two_group_model": {
+    "bootstrap": {
+      "draws": 2000,
+      "failed_fits": 0,
+      "lower": 0.0975610311427345,
+      "seed": 20260915,
+      "upper": 0.3822283149091807
+    },
+    "converged": true,
+    "covariates": [
+      "intercept",
+      "burden_two_or_more",
+      "age_per10_cent65",
+      "early_day_per30_cent90",
+      "year_day_per30_cent365",
+      "country_us"
+    ],
+    "events": 78,
+    "n": 189,
+    "params": {
+      "age_per10_cent65": {
+        "coef": -0.4358472445214242,
+        "or": 0.64671650788017,
+        "wald_ci": [
+          -0.9137144207693768,
+          0.04201993172652846
+        ]
+      },
+      "burden_two_or_more": {
+        "coef": -1.1893879181710991,
+        "or": 0.30440752937339405,
+        "wald_ci": [
+          -1.8783953326573761,
+          -0.5003805036848222
+        ]
+      },
+      "country_us": {
+        "coef": 1.6269411109904897,
+        "or": 5.08828638589871,
+        "wald_ci": [
+          0.8405946824650575,
+          2.4132875395159217
+        ]
+      },
+      "early_day_per30_cent90": {
+        "coef": -0.9833200459411024,
+        "or": 0.37406711494553807,
+        "wald_ci": [
+          -1.7255236216283185,
+          -0.2411164702538865
+        ]
+      },
+      "intercept": {
+        "coef": -0.9382986797512177,
+        "or": 0.39129298405959245,
+        "wald_ci": [
+          -1.5706019336008725,
+          -0.30599542590156303
+        ]
+      },
+      "year_day_per30_cent365": {
+        "coef": 0.17168722597718794,
+        "or": 1.1873064165279803,
+        "wald_ci": [
+          -0.14198160943565896,
+          0.48535606139003484
+        ]
+      }
+    },
+    "standardized_difference": 0.24512417710800954,
+    "standardized_one_pad": 0.521725613534078,
+    "standardized_two_or_more": 0.27660143642606844
+  },
+  "range_reliant": {
+    "by_centre": {
+      "Be\u0142chat\u00f3w": 7,
+      "Brigham and Women's Hospital": 13,
+      "Salve Medica": 3
+    },
+    "by_period": {
+      "2017-2024": 22,
+      "2025-2026": 1
+    },
+    "n": 23,
+    "pad_free": 3,
+    "span_width_max": 3.0,
+    "span_width_median": 1.0,
+    "span_width_min": 1.0
+  },
+  "seed": 20260914,
+  "status": "exploratory_post_hoc_disclosed",
+  "table1_by_group": {
+    "age": {
+      "one": {
+        "median": 64.0,
+        "q1": 58.8,
+        "q3": 67.0
+      },
+      "two_or_more": {
+        "median": 66.0,
+        "q1": 59.0,
+        "q3": 70.0
+      }
+    },
+    "any_complication_30d": {
+      "one": {
+        "False": 56,
+        "True": 39,
+        "missing_not_recorded": 9
+      },
+      "two_or_more": {
+        "False": 47,
+        "True": 25,
+        "missing_not_recorded": 13
+      }
+    },
+    "any_complication_90d": {
+      "one": {
+        "False": 52,
+        "True": 43,
+        "missing_not_recorded": 9
+      },
+      "two_or_more": {
+        "False": 41,
+        "True": 35,
+        "missing_not_recorded": 9
+      }
+    },
+    "bmi": {
+      "one": {
+        "median": 28.2,
+        "missing": 12,
+        "n": 92,
+        "q1": 26.0,
+        "q3": 31.2
+      },
+      "two_or_more": {
+        "median": 28.1,
+        "missing": 4,
+        "n": 81,
+        "q1": 25.5,
+        "q3": 30.6
+      }
+    },
+    "centre": {
+      "one": {
+        "Be\u0142chat\u00f3w": 15,
+        "Brigham and Women's Hospital": 65,
+        "Salve Medica": 24
+      },
+      "two_or_more": {
+        "Be\u0142chat\u00f3w": 22,
+        "Brigham and Women's Hospital": 48,
+        "Salve Medica": 15
+      }
+    },
+    "continence_assessment_method_src": {
+      "one": {
+        "phone": 3,
+        "questionnaire": 5,
+        "visit": 96
+      },
+      "two_or_more": {
+        "questionnaire": 5,
+        "visit": 80
+      }
+    },
+    "country": {
+      "one": {
+        "Poland": 39,
+        "United States": 65
+      },
+      "two_or_more": {
+        "Poland": 37,
+        "United States": 48
+      }
+    },
+    "early_day": {
+      "one": {
+        "median": 94.0,
+        "q1": 86.8,
+        "q3": 104.2
+      },
+      "two_or_more": {
+        "median": 88.0,
+        "q1": 73.0,
+        "q3": 99.0
+      }
+    },
+    "isup_grade_preop": {
+      "one": {
+        "1.0": 19,
+        "2.0": 42,
+        "3.0": 23,
+        "4.0": 9,
+        "5.0": 4,
+        "missing_not_recorded": 7
+      },
+      "two_or_more": {
+        "1.0": 21,
+        "2.0": 27,
+        "3.0": 19,
+        "4.0": 10,
+        "5.0": 1,
+        "missing_not_recorded": 7
+      }
+    },
+    "n": {
+      "one": 104,
+      "two_or_more": 85
+    },
+    "nerve_sparing_state": {
+      "one": {
+        "not_assessed": 15,
+        "not_performed": 18,
+        "performed": 71
+      },
+      "two_or_more": {
+        "not_assessed": 8,
+        "not_performed": 17,
+        "performed": 60
+      }
+    },
+    "operative_period": {
+      "one": {
+        "2017-2024": 102,
+        "2025-2026": 2
+      },
+      "two_or_more": {
+        "2017-2024": 77,
+        "2025-2026": 8
+      }
+    },
+    "pad_count_instrument_src": {
+      "one": {
+        "EPIC": 5,
+        "free_text": 99
+      },
+      "two_or_more": {
+        "EPIC": 5,
+        "free_text": 80
+      }
+    },
+    "postoperative_treatment_any_documented": {
+      "one": {
+        "False": 15,
+        "True": 24,
+        "missing_not_recorded": 65
+      },
+      "two_or_more": {
+        "False": 8,
+        "True": 15,
+        "missing_not_recorded": 62
+      }
+    },
+    "psa_preop": {
+      "one": {
+        "median": 6.6,
+        "missing": 3,
+        "n": 101,
+        "q1": 5.1,
+        "q3": 9.4
+      },
+      "two_or_more": {
+        "median": 7.9,
+        "missing": 5,
+        "n": 80,
+        "q1": 5.6,
+        "q3": 11.3
+      }
+    },
+    "year_day": {
+      "one": {
+        "median": 378.0,
+        "q1": 354.0,
+        "q3": 397.2
+      },
+      "two_or_more": {
+        "median": 367.0,
+        "q1": 350.0,
+        "q3": 378.0
+      }
+    }
+  },
+  "table1_extension": {
+    "any_complication_30d": {
+      "False": 115,
+      "True": 73,
+      "missing_not_recorded": 25
+    },
+    "any_complication_90d": {
+      "False": 103,
+      "True": 89,
+      "missing_not_recorded": 21
+    },
+    "bmi": {
+      "median": 28.19,
+      "missing": 18,
+      "n": 195,
+      "q1": 25.85,
+      "q3": 30.85
+    },
+    "centre": {
+      "Be\u0142chat\u00f3w": 41,
+      "Brigham and Women's Hospital": 130,
+      "Salve Medica": 42
+    },
+    "continence_assessment_method_src": {
+      "phone": 3,
+      "questionnaire": 10,
+      "visit": 200
+    },
+    "continence_baseline_text_state": {
+      "missing_not_recorded": 62,
+      "not_assessed": 151
+    },
+    "denominator": 213,
+    "distinct_surgeon_codes": 10,
+    "epic_incontinence_12m_present": 31,
+    "epic_incontinence_3m_present": 39,
+    "has_comp_urinary_retention": {
+      "True": 9,
+      "missing_not_recorded": 204
+    },
+    "isup_grade_preop": {
+      "1.0": 43,
+      "2.0": 78,
+      "3.0": 47,
+      "4.0": 20,
+      "5.0": 7,
+      "missing_not_recorded": 18
+    },
+    "nerve_sparing_state": {
+      "not_assessed": 29,
+      "not_performed": 39,
+      "performed": 145
+    },
+    "pad_count_instrument_src": {
+      "EPIC": 10,
+      "free_text": 203
+    },
+    "postoperative_treatment_any_documented": {
+      "False": 26,
+      "True": 42,
+      "missing_not_recorded": 145
+    },
+    "postoperative_treatment_date_present": {
+      "no": 174,
+      "yes": 39
+    },
+    "psa_preop": {
+      "median": 7.16,
+      "missing": 9,
+      "n": 204,
+      "q1": 5.1975,
+      "q3": 10.185
+    },
+    "treatment_timing": {
+      "first_treatment_starting_between_assessments_by_burden": {
+        "nonconflicting_quantity_uncertain": {
+          "n": 22,
+          "treatment_starting_between_assessments": 0
+        },
+        "one": {
+          "n": 104,
+          "treatment_starting_between_assessments": 10
+        },
+        "two_or_more": {
+          "n": 85,
+          "treatment_starting_between_assessments": 7
+        },
+        "unresolved_quantity_evidence": {
+          "n": 2,
+          "treatment_starting_between_assessments": 0
+        }
+      },
+      "surgery_date_missing": 0,
+      "treatment_date_documented_but_unparseable": 0
+    }
+  },
+  "tier": "D-prototype"
+}

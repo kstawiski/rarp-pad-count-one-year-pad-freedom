@@ -21,6 +21,7 @@ Local execution only, from manuscript1/:
 without writing.
 """
 
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -41,12 +42,18 @@ def fail(code, detail=''):
     sys.exit(1)
 
 
-def load_drv06():
-    spec = importlib.util.spec_from_file_location(
-        'drv06', HERE / 'scripts/06_derive_observed_assessments.py')
+def load_module(name, filename):
+    spec = importlib.util.spec_from_file_location(name, HERE / 'scripts' / filename)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def load_drv06():
+    return load_module('drv06', '06_derive_observed_assessments.py')
+
+
+cohort_mod = load_module('cohort', 'cohort.py')
 
 
 def wilson(numer, denom):
@@ -80,10 +87,19 @@ def boot_diff(a_out, a_n, b_out, b_n, seed, draws=DRAWS):
             'upper': float(np.percentile(diffs, 97.5))}
 
 
-def main(argv):
-    verify = '--verify' in argv
+def main(argv=None):
+    ap = argparse.ArgumentParser(description='Post hoc two-group analyses.')
+    ap.add_argument('--verify', action='store_true')
+    cohort_mod.add_cohort_args(ap)
+    args = ap.parse_args(argv)
+    verify = args.verify
+    cohort_name = args.cohort
+    out_path = cohort_mod.output_path(EVIDENCE, cohort_name)
+    if not verify:
+        cohort_mod.assert_writable_output(out_path)
+
     d = load_drv06()
-    res = d.source_derive()
+    res = d.source_derive(cohort=cohort_name)
     if res['source_verification']['bound_inputs_before'] != 122:
         fail('BOUND_INPUT_COUNT', str(res['source_verification']['bound_inputs_before']))
     selection, sets = res['selection'], res['sets']
@@ -92,8 +108,6 @@ def main(argv):
     patients = d.read_core_tables(d.bind_root(d.RELEASE))[0]
     id_set = set(patients[d.ID].astype(str))
     pairs = frame.loc[frame[d.ID].isin(sets['early_users_with_year'])].copy()
-    if len(pairs) != 226:
-        fail('PAIR_COUNT', str(len(pairs)))
     out = pairs['_year_status'].eq(1).to_numpy()
     burden = pairs['_burden'].astype(str)
     one = burden.eq('one')
@@ -107,22 +121,18 @@ def main(argv):
                 'difference': est, 'bootstrap': boot_diff(oa, na, ob, nb, SEED)}
 
     ref = contrast(one, two)
-    if not (abs(ref['difference'] - 0.2635) < 0.005 and ref['a_n'] == 110
-            and ref['b_n'] == 91 and ref['a_events'] == 58 and ref['b_events'] == 24):
-        fail('CALIBRATION_MISMATCH', json.dumps({k: ref[k] for k in ('a_n', 'b_n', 'a_events', 'b_events')}))
-    if int(out.sum()) != 86:
-        fail('CALIBRATION_OVERALL', str(int(out.sum())))
 
     # Country-standardized check (reviewer arithmetic cross-check).
-    std_w = {'Poland': 81 / 201, 'United States': 120 / 201}
+    classifiable = (one | two)
+    n_classifiable = int(classifiable.sum())
+    std_w = {c: int((classifiable & (pairs['_country'] == c)).sum()) / n_classifiable
+             for c in ('Poland', 'United States')}
     std_one = sum((out[(burden.eq('one')) & (pairs['_country'] == c)].mean()) * w
                   for c, w in std_w.items())
     std_two = sum((out[(burden.eq('two_or_more')) & (pairs['_country'] == c)].mean()) * w
                   for c, w in std_w.items())
     std_diff = float(std_one - std_two)
     country_std_diff = round(std_diff, 4)
-    if abs(std_diff - 0.2474) > 0.005:
-        fail('STANDARDIZED_CHECK', str(std_diff))
 
     # P6 contrast-consistent reclassification from day-row evidence.
     chosen = selection['selected']['early']
@@ -199,13 +209,26 @@ def main(argv):
     exact_mask = pairs[d.ID].map(exact_map).fillna(False).astype(bool)
     ex = contrast(one & exact_mask, two & exact_mask)
 
-    # Post hoc adjusted model on the 201 classifiable pairs.
+    # Post hoc adjusted model on the classifiable pairs.
     sub = pairs.loc[(one | two).to_numpy()].copy().reset_index(drop=True)
-    if len(sub) != 201:
-        fail('CLASSIFIABLE_COUNT', str(len(sub)))
     y = sub['_year_status'].eq(1).astype(float).to_numpy()
-    if int(y.sum()) != 82:
-        fail('CLASSIFIABLE_EVENTS', str(int(y.sum())))
+    observed_gates = {
+        'pair_count': int(len(pairs)),
+        'overall_events': int(out.sum()),
+        'one_n': int(ref['a_n']),
+        'two_n': int(ref['b_n']),
+        'one_events': int(ref['a_events']),
+        'two_events': int(ref['b_events']),
+        'difference': float(ref['difference']),
+        'country_standardized_difference': float(std_diff),
+        'classifiable_count': int(len(sub)),
+        'classifiable_events': int(y.sum()),
+    }
+    try:
+        cohort_mod.check_or_record_gates(
+            '10_posthoc_twogroup_analyses', cohort_name, observed_gates, record=args.record_gates)
+    except cohort_mod.GateError as exc:
+        fail(exc.code, exc.detail)
     X = pd.DataFrame({
         'intercept': np.ones(len(sub)),
         'burden_two_or_more': (sub['_burden'].astype(str) == 'two_or_more').astype(float).to_numpy(),
@@ -273,7 +296,7 @@ def main(argv):
     }
     _country_us = (sub['_country'].astype(str) == 'United States').astype(float).to_numpy()
     model = fit_variant('country', {**_base_cols, 'country_us': _country_us}, SEED + 1)
-    model['n'] = 201
+    model['n'] = int(len(sub))
     model['events'] = int(y.sum())
 
     # Centre-adjusted sensitivity variants (reviewer request): centre rather
@@ -289,7 +312,7 @@ def main(argv):
         fail('CENTRE_PERIOD_COMPLETENESS', str(int(pd.isna(_yr).sum())))
     _centre_b = (_cen.to_numpy() == 'Bełchatów').astype(float)
     _centre_s = (_cen.to_numpy() == 'Salve Medica').astype(float)
-    _period_recent = (_yr >= 2025).astype(float)
+    _period_recent = (_yr >= cohort_mod.recent_period_start_year(cohort_name)).astype(float)
     _centre_base = {'burden_two_or_more': _base_cols['burden_two_or_more'],
                     'age_per10_cent65': _base_cols['age_per10_cent65'],
                     'early_day_per30_cent90': _base_cols['early_day_per30_cent90'],
@@ -301,12 +324,13 @@ def main(argv):
                        'year_day_per30_cent365': _base_cols['year_day_per30_cent365']}, SEED + 11)
     centre_models = {'no_yearday': _v1, 'with_yearday': _v2}
 
-    # Extended Table 1 aggregates among the 226 pairs (distributions only).
+    # Extended Table 1 aggregates among the paired early users (distributions only).
     release_root = d.RELEASE
     pw = pd.read_csv(release_root / 'tables/patient_wide.csv', dtype=str, keep_default_na=False)
     pair_ids = set(pairs[d.ID].astype(str))
     pw = pw.loc[pw[d.ID].astype(str).isin(pair_ids)].copy()
-    if len(pw) != 226:
+    n_pairs = int(len(pairs))
+    if len(pw) != n_pairs:
         fail('TABLE1_DENOMINATOR', str(len(pw)))
 
     def numcol(name):
@@ -324,8 +348,8 @@ def main(argv):
             return {'column_absent_in_release': True}
         v = numcol(name).dropna().to_numpy(float)
         if len(v) == 0:
-            return {'n': 0, 'missing': 226}
-        return {'n': int(len(v)), 'missing': int(226 - len(v)),
+            return {'n': 0, 'missing': n_pairs}
+        return {'n': int(len(v)), 'missing': int(n_pairs - len(v)),
                 'median': float(np.median(v)), 'q1': float(np.percentile(v, 25)),
                 'q3': float(np.percentile(v, 75))}
 
@@ -384,12 +408,13 @@ def main(argv):
                 'q3': round(float(np.percentile(v, 75)), 1), 'n': int(len(v)),
                 'missing': int(ntot - len(v))} if len(v) else None
 
+    n_g1, n_g2 = int(g1.sum()), int(g2.sum())
     by_group = {
-        'n': {'one': 110, 'two_or_more': 91},
+        'n': {'one': n_g1, 'two_or_more': n_g2},
         'country': {'one': _grp(g1, 'country'), 'two_or_more': _grp(g2, 'country')},
         'centre': {'one': _grp(g1, 'operation_centre'), 'two_or_more': _grp(g2, 'operation_centre')},
-        'bmi': {'one': _grpmed(g1, 'bmi', 110), 'two_or_more': _grpmed(g2, 'bmi', 91)},
-        'psa_preop': {'one': _grpmed(g1, 'psa_preop', 110), 'two_or_more': _grpmed(g2, 'psa_preop', 91)},
+        'bmi': {'one': _grpmed(g1, 'bmi', n_g1), 'two_or_more': _grpmed(g2, 'bmi', n_g2)},
+        'psa_preop': {'one': _grpmed(g1, 'psa_preop', n_g1), 'two_or_more': _grpmed(g2, 'psa_preop', n_g2)},
         'isup_grade_preop': {'one': _grp(g1, 'isup_grade_preop'), 'two_or_more': _grp(g2, 'isup_grade_preop')},
         'nerve_sparing_state': {'one': _grp(g1, 'nerve_sparing_state'), 'two_or_more': _grp(g2, 'nerve_sparing_state')},
         'pad_count_instrument_src': {'one': _grp(g1, 'pad_count_instrument_src'), 'two_or_more': _grp(g2, 'pad_count_instrument_src')},
@@ -430,17 +455,18 @@ def main(argv):
                if bool(cols['informative'][i]) and not bool(cols['invalid'][i]) and pd.notna(cols['upper'][i])]
         spans.append((max(his) - min(los)) if los and his else float('nan'))
     spans = np.array(spans)
+    has_spans = bool(len(spans) and not np.all(np.isnan(spans)))
     range23 = {
         'n': int(rel23.sum()),
         'pad_free': int((out[rel23] == 1).sum()),
         'by_centre': {str(k): int(v) for k, v in pwg.loc[rel23, 'operation_centre'].astype(str).value_counts().items()},
         'by_period': {str(k): int(v) for k, v in op_period[rel23].value_counts().items()},
-        'span_width_median': round(float(np.nanmedian(spans)), 1),
-        'span_width_min': round(float(np.nanmin(spans)), 1),
-        'span_width_max': round(float(np.nanmax(spans)), 1),
+        'span_width_median': round(float(np.nanmedian(spans)), 1) if has_spans else None,
+        'span_width_min': round(float(np.nanmin(spans)), 1) if has_spans else None,
+        'span_width_max': round(float(np.nanmax(spans)), 1) if has_spans else None,
     }
     table1 = {
-        'denominator': 226,
+        'denominator': n_pairs,
         'centre': dist('operation_centre'),
         'bmi': med_iqr('bmi'),
         'psa_preop': med_iqr('psa_preop'),
@@ -450,7 +476,7 @@ def main(argv):
         'continence_assessment_method_src': dist('continence_assessment_method_src'),
         'continence_baseline_text_state': dist('continence_baseline_text_state'),
         'postoperative_treatment_any_documented': dist('postoperative_treatment_any_documented'),
-        'postoperative_treatment_date_present': {'yes': int(tx.sum()), 'no': int(226 - int(tx.sum()))},
+        'postoperative_treatment_date_present': {'yes': int(tx.sum()), 'no': int(n_pairs - int(tx.sum()))},
         'any_complication_30d': dist('any_complication_30d'),
         'any_complication_90d': dist('any_complication_90d'),
         'has_comp_urinary_retention': dist('has_comp_urinary_retention'),
@@ -464,6 +490,7 @@ def main(argv):
         },
     }
 
+    is_all_ops = cohort_name == cohort_mod.COHORT_ALL_OPERATIONS
     record = {
         'analysis_id': 'M1-POSTHOC', 'amendment': 'A-OBS-2', 'tier': 'D-prototype',
         'status': 'exploratory_post_hoc_disclosed',
@@ -473,7 +500,12 @@ def main(argv):
         'p6_contrast_consistent_rule': {**{k: p6[k] for k in ('a_n', 'b_n', 'a_events', 'b_events', 'difference')},
                                         'bootstrap_ci': [p6['bootstrap']['lower'], p6['bootstrap']['upper']],
                                         'failed_draws': p6['bootstrap']['failed_draws'],
-                                        'reclassified_unresolved': p6_evidence},
+                                        **({'reclassified_unresolved': p6_evidence} if is_all_ops else
+                                           # Counts only: one entry per man is row-level detail.
+                                           {'reclassified_unresolved_count': len(p6_evidence),
+                                            'reclassified_unresolved_by_year_status': {
+                                                k: sum(1 for e in p6_evidence if e.get('year_status') == k)
+                                                for k in sorted({e.get('year_status') for e in p6_evidence})}})},
         'exact_count_only_subset': {**{k: ex[k] for k in ('a_n', 'b_n', 'a_events', 'b_events', 'difference')},
                                     'bootstrap_ci': [ex['bootstrap']['lower'], ex['bootstrap']['upper']],
                                     'bootstrap_lower': ex['bootstrap']['lower'],
@@ -481,24 +513,37 @@ def main(argv):
                                     'failed_draws': ex['bootstrap']['failed_draws']},
         'posthoc_adjusted_two_group_model': model,
         'centre_adjusted_sensitivity': centre_models,
-        'table1_extension_226': table1,
-        'table1_by_group_201': by_group,
+        'table1_extension_226' if is_all_ops else 'table1_extension': table1,
+        'table1_by_group_201' if is_all_ops else 'table1_by_group': by_group,
         'epic_excluded_contrast': epic_excluded,
-        'range_reliant_23': range23,
+        'range_reliant_23' if is_all_ops else 'range_reliant': range23,
         'code_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
+    if not is_all_ops:
+        record['cohort'] = res['cohort']
     text = json.dumps(record, indent=2, sort_keys=True)
     for pid in id_set:
         if pid and pid in text:
             fail('IDENTIFIER_LEAK', 'identity present in record')
+    max_float_diff = 0.0
     if verify:
-        saved = EVIDENCE.read_text()
-        if saved != text and json.loads(saved) != json.loads(text):
+        if not out_path.is_file():
+            fail('SAVED_POSTHOC_MISMATCH', 'missing_output')
+        saved = out_path.read_text()
+        if is_all_ops:
+            ok, reason, max_float_diff = cohort_mod.compare_records_ignoring_provenance(
+                json.loads(saved), json.loads(text), ignore_keys=('code_sha256',), float_tol=1e-12)
+            if not ok:
+                fail('SAVED_POSTHOC_MISMATCH', reason)
+        elif saved != text and json.loads(saved) != json.loads(text):
             fail('SAVED_POSTHOC_MISMATCH', '')
-        print(json.dumps({'status': 'saved_posthoc_recomputed_exactly'}))
+        print(json.dumps({'status': 'saved_posthoc_recomputed_exactly', 'cohort': cohort_name,
+                          'max_float_diff': max_float_diff}))
         return 0
-    EVIDENCE.write_text(text)
+    out_path.write_text(text)
     print(json.dumps({'status': 'posthoc_prototype_written',
+                      'cohort': cohort_name,
+                      'path': str(out_path),
                       'p6_difference': round(p6['difference'], 4),
                       'exact_difference': round(ex['difference'], 4),
                       'adjusted_standardized_difference': round(model['standardized_difference'], 4),

@@ -1,0 +1,647 @@
+{
+  "amendment": "A-OBS-4",
+  "analysis_id": "M1-CLINICAL-ADJUSTMENT",
+  "by_group": {
+    "bmi": {
+      "one": {
+        "median": 28.16,
+        "missing": 12,
+        "n": 92,
+        "q1": 25.9875,
+        "q3": 31.2425
+      },
+      "two_or_more": {
+        "median": 28.09,
+        "missing": 4,
+        "n": 81,
+        "q1": 25.50361570247934,
+        "q3": 30.56
+      }
+    },
+    "final_isup_grade_group": {
+      "one": {
+        "1-2": 66,
+        "3-5": 37,
+        "missing": 1
+      },
+      "two_or_more": {
+        "1-2": 53,
+        "3-5": 31,
+        "missing": 1
+      }
+    },
+    "interim_treatment": {
+      "one": 10,
+      "two_or_more": 7
+    },
+    "nerve_sparing_state": {
+      "one": {
+        "not_assessed": 15,
+        "not_performed": 18,
+        "performed": 71
+      },
+      "two_or_more": {
+        "not_assessed": 8,
+        "not_performed": 17,
+        "performed": 60
+      }
+    },
+    "pathological_stage": {
+      "one": {
+        "pT2": 58,
+        "pT3-4": 46
+      },
+      "two_or_more": {
+        "pT2": 42,
+        "pT3-4": 43
+      }
+    },
+    "prostate_volume_cc": {
+      "one": {
+        "median": 40.0,
+        "missing": 39,
+        "n": 65,
+        "q1": 31.0,
+        "q3": 50.84
+      },
+      "two_or_more": {
+        "median": 37.2,
+        "missing": 40,
+        "n": 45,
+        "q1": 29.0,
+        "q3": 56.0
+      }
+    },
+    "prostate_volume_recorded_by_country": {
+      "Poland": 18,
+      "United States": 92
+    }
+  },
+  "clinical": {
+    "crude_same_men": {
+      "bootstrap_lower": 0.0783963285251945,
+      "bootstrap_upper": 0.3573255813953488,
+      "difference": 0.21648351648351655,
+      "n": 171,
+      "newcombe_lower": 0.06868128578319074,
+      "newcombe_upper": 0.35051999569238046,
+      "one_events": 47,
+      "one_n": 91,
+      "two_events": 24,
+      "two_n": 80
+    },
+    "model": {
+      "bootstrap": {
+        "draws": 2000,
+        "draws_with_coefficient_above_10": 0,
+        "failed_fits": 28,
+        "lower": 0.07388654647821453,
+        "seed": 20260926,
+        "upper": 0.36746495526520045
+      },
+      "covariates": [
+        "intercept",
+        "two_or_more",
+        "age_per10_cent65",
+        "early_day_per30_cent90",
+        "centre_belchatow",
+        "centre_salve",
+        "period_recent",
+        "nerve_sparing_not_performed",
+        "nerve_sparing_not_stated",
+        "pt3_or_higher",
+        "isup_3_or_higher",
+        "bmi_per5_cent28"
+      ],
+      "events": 71,
+      "events_per_parameter": 6.454545454545454,
+      "n": 171,
+      "non_events": 100,
+      "parameters_excluding_intercept": 11,
+      "params": {
+        "age_per10_cent65": {
+          "coef": -0.39039539055962624,
+          "or": 0.676789225518085,
+          "wald_ci_or": [
+            0.40278851817582567,
+            1.1371815111607118
+          ]
+        },
+        "bmi_per5_cent28": {
+          "coef": 0.09009236985459848,
+          "or": 1.0942753570926969,
+          "wald_ci_or": [
+            0.6976741800498328,
+            1.7163291854298226
+          ]
+        },
+        "centre_belchatow": {
+          "coef": -1.6499614688330995,
+          "or": 0.19205730867040177,
+          "wald_ci_or": [
+            0.06285302724462978,
+            0.5868613085278174
+          ]
+        },
+        "centre_salve": {
+          "coef": -2.1075097817780235,
+          "or": 0.12154025164845428,
+          "wald_ci_or": [
+            0.03219390059069556,
+            0.45884569746851045
+          ]
+        },
+        "early_day_per30_cent90": {
+          "coef": -1.0864222103659882,
+          "or": 0.33742156004416435,
+          "wald_ci_or": [
+            0.14723615682424965,
+            0.7732700420762821
+          ]
+        },
+        "intercept": {
+          "coef": 0.4906097983975447,
+          "or": 1.6333119073240208,
+          "wald_ci_or": [
+            0.6963572959257239,
+            3.8309468461302343
+          ]
+        },
+        "isup_3_or_higher": {
+          "coef": 0.17423029431807266,
+          "or": 1.1903296604153644,
+          "wald_ci_or": [
+            0.5484837031249369,
+            2.583275842822645
+          ]
+        },
+        "nerve_sparing_not_performed": {
+          "coef": -0.5987499908706833,
+          "or": 0.5494980845934822,
+          "wald_ci_or": [
+            0.18345784258430162,
+            1.6458721018326377
+          ]
+        },
+        "nerve_sparing_not_stated": {
+          "coef": 0.16844625698514354,
+          "or": 1.1834646221789489,
+          "wald_ci_or": [
+            0.4313020491638177,
+            3.247349542309243
+          ]
+        },
+        "period_recent": {
+          "coef": -0.07879871559822563,
+          "or": 0.9242259379886788,
+          "wald_ci_or": [
+            0.4382515722546324,
+            1.9490941699457283
+          ]
+        },
+        "pt3_or_higher": {
+          "coef": 0.49548356294997686,
+          "or": 1.6412917150572903,
+          "wald_ci_or": [
+            0.7999640336936802,
+            3.3674495107954043
+          ]
+        },
+        "two_or_more": {
+          "coef": -1.1059179935692716,
+          "or": 0.33090697229704,
+          "wald_ci_or": [
+            0.15885298266728895,
+            0.6893129891311898
+          ]
+        }
+      },
+      "standardized_difference": 0.22121103926131136,
+      "standardized_one_pad": 0.5170249876081363,
+      "standardized_two_or_more": 0.29581394834682495
+    }
+  },
+  "clinical_no_interim_treatment": {
+    "crude_same_men": {
+      "bootstrap_lower": 0.0885860523392493,
+      "bootstrap_upper": 0.39374804432438987,
+      "difference": 0.24367445608380345,
+      "n": 158,
+      "newcombe_lower": 0.09062710148395844,
+      "newcombe_upper": 0.37994752625511,
+      "one_events": 44,
+      "one_n": 85,
+      "two_events": 20,
+      "two_n": 73
+    },
+    "model": {
+      "bootstrap": {
+        "draws": 2000,
+        "draws_with_coefficient_above_10": 0,
+        "failed_fits": 88,
+        "lower": 0.09359083822916373,
+        "seed": 20260927,
+        "upper": 0.3961816936882583
+      },
+      "covariates": [
+        "intercept",
+        "two_or_more",
+        "age_per10_cent65",
+        "early_day_per30_cent90",
+        "centre_belchatow",
+        "centre_salve",
+        "period_recent",
+        "nerve_sparing_not_performed",
+        "nerve_sparing_not_stated",
+        "pt3_or_higher",
+        "isup_3_or_higher",
+        "bmi_per5_cent28"
+      ],
+      "events": 64,
+      "events_per_parameter": 5.818181818181818,
+      "n": 158,
+      "non_events": 94,
+      "parameters_excluding_intercept": 11,
+      "params": {
+        "age_per10_cent65": {
+          "coef": -0.5557183490141219,
+          "or": 0.5736600250360175,
+          "wald_ci_or": [
+            0.3218920429241168,
+            1.0223484287926417
+          ]
+        },
+        "bmi_per5_cent28": {
+          "coef": 0.0281616146590487,
+          "or": 1.0285619016705403,
+          "wald_ci_or": [
+            0.6385895631341243,
+            1.6566816099778892
+          ]
+        },
+        "centre_belchatow": {
+          "coef": -1.7180655172854968,
+          "or": 0.17941288354829846,
+          "wald_ci_or": [
+            0.053976655966873725,
+            0.5963500740555354
+          ]
+        },
+        "centre_salve": {
+          "coef": -2.4806483663844485,
+          "or": 0.08368894689793853,
+          "wald_ci_or": [
+            0.018570387058901638,
+            0.3771509883273388
+          ]
+        },
+        "early_day_per30_cent90": {
+          "coef": -1.1665507732176874,
+          "or": 0.3114393155995949,
+          "wald_ci_or": [
+            0.12635978926435942,
+            0.767605326550683
+          ]
+        },
+        "intercept": {
+          "coef": 0.7182984693804223,
+          "or": 2.0509405019481712,
+          "wald_ci_or": [
+            0.8389899643649847,
+            5.013596254056658
+          ]
+        },
+        "isup_3_or_higher": {
+          "coef": 0.14081225279548645,
+          "or": 1.1512084915178982,
+          "wald_ci_or": [
+            0.5025375744772123,
+            2.637177911167337
+          ]
+        },
+        "nerve_sparing_not_performed": {
+          "coef": -0.5874063772516218,
+          "or": 0.5557668666494515,
+          "wald_ci_or": [
+            0.165369330557497,
+            1.8677998454976894
+          ]
+        },
+        "nerve_sparing_not_stated": {
+          "coef": 0.06777370418077329,
+          "or": 1.0701231166889487,
+          "wald_ci_or": [
+            0.36980302383385366,
+            3.0966850216632413
+          ]
+        },
+        "period_recent": {
+          "coef": -0.38056598203204434,
+          "or": 0.6834744654542697,
+          "wald_ci_or": [
+            0.30674497157877445,
+            1.5228850941670133
+          ]
+        },
+        "pt3_or_higher": {
+          "coef": 0.6368034070450714,
+          "or": 1.8904282808876292,
+          "wald_ci_or": [
+            0.8756867621029198,
+            4.081047287499975
+          ]
+        },
+        "two_or_more": {
+          "coef": -1.2715256171711447,
+          "or": 0.2804035068867459,
+          "wald_ci_or": [
+            0.12538094335995303,
+            0.6270979031371585
+          ]
+        }
+      },
+      "standardized_difference": 0.24352678356597351,
+      "standardized_one_pad": 0.5157860988087253,
+      "standardized_two_or_more": 0.27225931524275176
+    }
+  },
+  "code_sha256": "d381656bc0dc4f8760fdf2885d6226276197951fe34bd42c743a16e75611fa41",
+  "cohort": {
+    "cohort_name": "completed_window",
+    "common_extract_date": "2026-04-01",
+    "eligible_robotic_patients": 1022,
+    "excluded_robotic_patients": 375,
+    "model_recent_period_start_year": 2024,
+    "robotic_patients_total": 1397,
+    "rule_name": "operation_date_plus_425_days_before_2026_04_01",
+    "unusable_operation_date_all_released_patients": 0,
+    "unusable_operation_date_robotic_patients": 0,
+    "year_window_close_day": 425
+  },
+  "covariate_sets": {
+    "clinical": [
+      "two_or_more",
+      "age_per10_cent65",
+      "early_day_per30_cent90",
+      "centre_belchatow",
+      "centre_salve",
+      "period_recent",
+      "nerve_sparing_not_performed",
+      "nerve_sparing_not_stated",
+      "pt3_or_higher",
+      "isup_3_or_higher",
+      "bmi_per5_cent28"
+    ],
+    "united_states": [
+      "two_or_more",
+      "age_per10_cent65",
+      "early_day_per30_cent90",
+      "nerve_sparing_not_performed",
+      "nerve_sparing_not_stated",
+      "pt3_or_higher",
+      "volume_per10_cent40",
+      "asa_3_or_4",
+      "surgeon_sequence_log2_cent32"
+    ]
+  },
+  "draws": 2000,
+  "events": 78,
+  "fields_not_available_for_adjustment": {
+    "continence_baseline_text_state": {
+      "blank": 55,
+      "not_assessed": 134
+    },
+    "epic_preoperative_incontinence_score_recorded": 32,
+    "has_diabetes_recorded": 145,
+    "pelvic_floor_training_medication_or_continence_surgery_fields": 0,
+    "prior_turp_recorded": 21
+  },
+  "ipw_clinical": {
+    "balance": {
+      "age_per10_cent65": {
+        "smd_unweighted": 0.2024306237682759,
+        "smd_weighted": -0.0028574704326863884
+      },
+      "bmi_per5_cent28": {
+        "smd_unweighted": -0.18386293606050694,
+        "smd_weighted": -0.025197413297969096
+      },
+      "centre_belchatow": {
+        "smd_unweighted": 0.266760586766023,
+        "smd_weighted": 0.008857299162086734
+      },
+      "centre_salve": {
+        "smd_unweighted": 0.01640035895727,
+        "smd_weighted": 0.007395783818497176
+      },
+      "early_day_per30_cent90": {
+        "smd_unweighted": -0.4765471473010292,
+        "smd_weighted": -0.011778611676333501
+      },
+      "isup_3_or_higher": {
+        "smd_unweighted": 0.0028216774207589323,
+        "smd_weighted": -0.019324879223213944
+      },
+      "nerve_sparing_not_performed": {
+        "smd_unweighted": 0.08901139345376537,
+        "smd_weighted": 0.003981813308793108
+      },
+      "nerve_sparing_not_stated": {
+        "smd_unweighted": -0.19105005942669945,
+        "smd_weighted": 0.012354784108159458
+      },
+      "period_recent": {
+        "smd_unweighted": 0.06100907866841045,
+        "smd_weighted": -0.015556455397381415
+      },
+      "pt3_or_higher": {
+        "smd_unweighted": 0.12060820070984027,
+        "smd_weighted": 0.008756978851668106
+      }
+    },
+    "bootstrap": {
+      "draws": 2000,
+      "failed_fits": 0,
+      "lower": 0.05064131523829903,
+      "seed": 20260928,
+      "upper": 0.34686065706453195
+    },
+    "covariates": [
+      "intercept",
+      "age_per10_cent65",
+      "early_day_per30_cent90",
+      "centre_belchatow",
+      "centre_salve",
+      "period_recent",
+      "nerve_sparing_not_performed",
+      "nerve_sparing_not_stated",
+      "pt3_or_higher",
+      "isup_3_or_higher",
+      "bmi_per5_cent28"
+    ],
+    "effective_sample_size": {
+      "one": 83.58810608177812,
+      "two_or_more": 72.72871148972118
+    },
+    "max_abs_smd_unweighted": 0.4765471473010292,
+    "max_abs_smd_weighted": 0.025197413297969096,
+    "max_weight": 4.2075788475689215,
+    "n": 171,
+    "propensity": {
+      "one": {
+        "max": 0.7623336279062755,
+        "median": 0.4162943429554123,
+        "min": 0.20728289313673437,
+        "n": 91,
+        "q1": 0.3105227514971536,
+        "q3": 0.5394873563853217
+      },
+      "two_or_more": {
+        "max": 0.8648536685461149,
+        "median": 0.49725393437676,
+        "min": 0.2512841919063393,
+        "n": 80,
+        "q1": 0.40031409701175136,
+        "q3": 0.6309598506212983
+      }
+    },
+    "weighted_difference": 0.20828827624781326,
+    "weighted_one_pad": 0.5110888626140588,
+    "weighted_two_or_more": 0.30280058636624557
+  },
+  "n_compared": 189,
+  "reference_seed": 20260907,
+  "seeds": {
+    "clinical": 20260926,
+    "clinical_no_interim_treatment": 20260927,
+    "ipw": 20260928,
+    "united_states": 20260929
+  },
+  "status": "exploratory_post_hoc_disclosed",
+  "united_states": {
+    "crude_same_men": {
+      "bootstrap_lower": -0.025211318853560292,
+      "bootstrap_upper": 0.37301739926739924,
+      "difference": 0.17641277641277636,
+      "n": 92,
+      "newcombe_lower": -0.030478795542834697,
+      "newcombe_upper": 0.3628012746432293,
+      "one_events": 32,
+      "one_n": 55,
+      "two_events": 15,
+      "two_n": 37
+    },
+    "model": {
+      "bootstrap": {
+        "draws": 2000,
+        "draws_with_coefficient_above_10": 2,
+        "failed_fits": 26,
+        "lower": 0.03945027959508134,
+        "seed": 20260929,
+        "upper": 0.46221093120322926
+      },
+      "covariates": [
+        "intercept",
+        "two_or_more",
+        "age_per10_cent65",
+        "early_day_per30_cent90",
+        "nerve_sparing_not_performed",
+        "nerve_sparing_not_stated",
+        "pt3_or_higher",
+        "volume_per10_cent40",
+        "asa_3_or_4",
+        "surgeon_sequence_log2_cent32"
+      ],
+      "events": 47,
+      "events_per_parameter": 5.0,
+      "n": 92,
+      "non_events": 45,
+      "parameters_excluding_intercept": 9,
+      "params": {
+        "age_per10_cent65": {
+          "coef": 0.09463901405584592,
+          "or": 1.0992619653761584,
+          "wald_ci_or": [
+            0.4893951643017491,
+            2.469123025044029
+          ]
+        },
+        "asa_3_or_4": {
+          "coef": -1.2523172678250631,
+          "or": 0.2858416571456019,
+          "wald_ci_or": [
+            0.09503014597846389,
+            0.8597845675019823
+          ]
+        },
+        "early_day_per30_cent90": {
+          "coef": -2.702928902253497,
+          "or": 0.06700896234100025,
+          "wald_ci_or": [
+            0.012427595897528551,
+            0.3613089024652422
+          ]
+        },
+        "intercept": {
+          "coef": 1.8667596232361636,
+          "or": 6.467305901325262,
+          "wald_ci_or": [
+            1.4820444191249333,
+            28.221856971070117
+          ]
+        },
+        "nerve_sparing_not_performed": {
+          "coef": -2.1294223378348316,
+          "or": 0.11890596149231845,
+          "wald_ci_or": [
+            0.017430574422285246,
+            0.8111395147331618
+          ]
+        },
+        "nerve_sparing_not_stated": {
+          "coef": 0.20557833877057105,
+          "or": 1.2282351956283482,
+          "wald_ci_or": [
+            0.3206800273230889,
+            4.704258348650796
+          ]
+        },
+        "pt3_or_higher": {
+          "coef": 0.7565494625784305,
+          "or": 2.130910733133148,
+          "wald_ci_or": [
+            0.7527788400492033,
+            6.032024694378038
+          ]
+        },
+        "surgeon_sequence_log2_cent32": {
+          "coef": -0.3135166411843893,
+          "or": 0.7308722163230869,
+          "wald_ci_or": [
+            0.5278766059174813,
+            1.0119300431292921
+          ]
+        },
+        "two_or_more": {
+          "coef": -1.4604245865474965,
+          "or": 0.232137691261756,
+          "wald_ci_or": [
+            0.0721427511025251,
+            0.7469621948261438
+          ]
+        },
+        "volume_per10_cent40": {
+          "coef": -0.02659042291413624,
+          "or": 0.9737599896386041,
+          "wald_ci_or": [
+            0.7827145751908929,
+            1.2114358764684046
+          ]
+        }
+      },
+      "standardized_difference": 0.26463194835495985,
+      "standardized_one_pad": 0.6179348567584251,
+      "standardized_two_or_more": 0.35330290840346523
+    }
+  }
+}
